@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "deck": {
+    "id": "deck-izzet-murktide",
+    "name": "Izzet Murktide",
+    "maindeck": [
+      { "cardId": "0c016ccc-a341-4b76-87ba-69c639d2746d", "quantity": 4 },

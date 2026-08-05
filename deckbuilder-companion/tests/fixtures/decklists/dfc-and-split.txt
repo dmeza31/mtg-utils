@@ -1,0 +1,24 @@
+Deck
+4 Delver of Secrets
+4 Fire // Ice
+4 Bonecrusher Giant
+3 Murktide Regent
+4 Unholy Heat
+4 Lightning Bolt
+4 Expressive Iteration
+4 Consider
+4 Counterspell
+4 Steam Vents
+4 Scalding Tarn
+3 Spirebluff Canal
+4 Island
+4 Mountain
+2 Fiery Islet
+
+Sideboard
+3 Fiery Cannonade
+2 Prismatic Ending
+2 Dress Down
+2 Rest in Peace
+3 Fire // Ice
+3 Alpine Moon

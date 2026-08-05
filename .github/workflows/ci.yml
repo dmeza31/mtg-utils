@@ -1,0 +1,159 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # SPEC-001 §6 — contract tests hit the live Scryfall API and must never run
+  # on a PR. Nightly is the only trigger that reaches the `contract` job.
+  schedule:
+    - cron: "17 6 * * *"
+
+# The app is a subfolder of this repo; every job runs from there.
+defaults:
+  run:
+    working-directory: deckbuilder-companion
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  # Static analysis and unit tests run as separate jobs from the build so a
+  # fast failure is never masked by a slow one (SPEC-000 Task 7).
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      # Asserts the domain purity rule actually fires. Without this, a config
+      # regression turns the rule into a no-op and lint just goes green.
+      - name: Domain purity rule is enforced
+        run: pnpm lint:purity
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  unit:
+    name: Unit tests (Vitest)
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # Runs the `unit` and `dom` projects with coverage; enforces the 90%
+      # src/domain/** threshold from SPEC-001 Task 1. `contract` is excluded —
+      # it hits the live API and is nightly-only (see the `contract` job).
+      - run: pnpm test:unit
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: deckbuilder-companion/coverage
+          retention-days: 14
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/2, 2/2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      # webServer in playwright.config.ts builds and starts the production
+      # server itself — SPEC-001 Task 2 is explicit that dev-mode timing and
+      # bundle behaviour differ enough to hide real problems.
+      - run: pnpm test:e2e -- --shard=${{ matrix.shard }}
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ strategy.job-index }}
+          path: deckbuilder-companion/playwright-report
+          retention-days: 14
+
+  story-coverage:
+    name: Story traceability
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # SPEC-001 Task 8 — fails until every user story in requirements.md §6
+      # has a tests/e2e/<STORY>-*.spec.ts file. Expected to be red until
+      # milestone M3 (SPEC-E): this is the burn-down list, not a broken check.
+      - run: pnpm check:stories
+
+  contract:
+    name: Scryfall contract tests (nightly)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # Hits the LIVE Scryfall API — never runs on push or pull_request.
+      # A failure here means the fixtures are stale, not that the code
+      # regressed: run `pnpm fixtures:refresh` and review the diff.
+      - run: pnpm test:contract

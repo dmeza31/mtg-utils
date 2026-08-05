@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "deck": {
+    "id": "deck-izzet-murktide",
+    "name": "Izzet Murktide",
+    "format": "modern",
+    "maindeck": [
+      {
+        "cardId": "0c016ccc-a341-4b76-87ba-69c639d2746d",
+        "quantity": 4
+      }
+    ],
+    "sideboard": [],
+    "importedAt": "2026-07-30T18:04:00.000Z",
+    "sourceText": "4 Dragon's Rage Channeler\n"
+  },
+  "matchups": [
+    {
+      "id": "matchup-future",
+      "name": "Some Future Archetype",
+      "colorTag": "#3366ff",
+      "tags": [],
+      "gamePlan": "",
+      "splitPlayDraw": false,
+      "plans": {}
+    }
+  ]
+}

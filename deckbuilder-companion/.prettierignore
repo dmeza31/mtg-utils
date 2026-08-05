@@ -1,0 +1,14 @@
+.next/
+node_modules/
+coverage/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+
+# Specs and requirements are authored documents — Prettier would reflow their
+# tables and diagrams. Leave them exactly as written.
+docs/
+
+# Deliberately invalid JSON (NFR-4.4 corrupt-workspace fixture) — Prettier
+# can't parse it, and that's the point.
+tests/fixtures/workspaces/corrupt.json

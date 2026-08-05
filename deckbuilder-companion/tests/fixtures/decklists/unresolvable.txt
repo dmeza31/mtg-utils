@@ -1,0 +1,9 @@
+Deck
+4 Lightnin Bolt
+4 Monastery Swiftspear
+4 Goblin Guide
+4 Eidolon of the Great Revel
+16 Mountain
+
+Sideboard
+4 Path to Exile
