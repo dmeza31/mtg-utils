@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The app is a subfolder of this repo; every job runs from there.
+defaults:
+  run:
+    working-directory: deckbuilder-companion
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  # Static analysis and unit tests run as separate jobs from the build so a
+  # fast failure is never masked by a slow one (SPEC-000 Task 7).
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      # Asserts the domain purity rule actually fires. Without this, a config
+      # regression turns the rule into a no-op and lint just goes green.
+      - name: Domain purity rule is enforced
+        run: pnpm lint:purity
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: deckbuilder-companion/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  # TODO(SPEC-001): add `unit` and `e2e` jobs once Vitest and Playwright are
+  # configured. They are deliberately absent rather than present-and-skipped, so
+  # this workflow never reports green for tests that do not exist.
+  #
+  #   unit: pnpm test:unit  ->  upload coverage, enforce the 90% domain threshold
+  #   e2e:  pnpm build && pnpm test:e2e (sharded)  ->  upload report + traces on failure
+  #
+  # `test:contract` (live Scryfall) is nightly-only and never runs on PRs.
