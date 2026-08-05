@@ -1,0 +1,13 @@
+Deck
+4 Lightning Bolt (2XM) 129
+4 Monastery Swiftspear (M20) 146
+4 Goblin Guide (2XM) 121
+4 Eidolon of the Great Revel (DTK) 91
+16 Mountain (DOM) 259
+4 Sunbaked Canyon (MH1) 244
+
+Sideboard
+4 Smash to Smithereens (MH1) 233
+3 Deflecting Palm (MH2) 15
+4 Path to Exile (2XM) 24
+4 Searing Blood (MH1) 232

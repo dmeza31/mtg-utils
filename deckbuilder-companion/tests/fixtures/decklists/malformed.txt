@@ -1,0 +1,16 @@
+// This is a comment and should be ignored
+# So is this
+Deck
+4 Lightning Bolt
+Monastery Swiftspear
+   4    Goblin Guide
+4 Eidolon of the Great Revel
+
+this line is junk and resolves to nothing sensible
+4 Lava Spike
+16 Mountain
+
+Sideboard
+4 Smash to Smithereens
+not a real card at all
+3 Deflecting Palm

@@ -6,11 +6,11 @@ Import an MTGO decklist, build a sideboard plan per matchup, export it for the t
 
 ## Read this first
 
-| What                | Where                                           |
-| ------------------- | ----------------------------------------------- |
-| **What** to build   | `docs/requirements/requirements.md`             |
-| **How** to build it | `docs/specs/` — start at `docs/specs/README.md` |
-| Current progress    | SPEC-000 done. SPEC-001 (test runners) is next. |
+| What                | Where                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| **What** to build   | `docs/requirements/requirements.md`                         |
+| **How** to build it | `docs/specs/` — start at `docs/specs/README.md`             |
+| Current progress    | SPEC-000 and SPEC-001 done. SPEC-002 (domain core) is next. |
 
 Specs are written to be opened cold. To start a session:
 
@@ -56,9 +56,13 @@ pnpm lint:purity    # assert the domain purity rule actually fires
 pnpm format         # prettier --write
 ```
 
-`pnpm test:unit`, `pnpm test:e2e` and `pnpm test` are declared in `package.json`
-but **the runners are not installed until SPEC-001**. They will fail with
-"command not found" until then; that is expected, not a broken checkout.
+```bash
+pnpm test:unit      # vitest — unit + dom projects, with coverage
+pnpm test:e2e       # playwright — story specs + smoke/infra specs
+pnpm test:contract  # vitest — LIVE Scryfall API, nightly-only, never on PRs
+pnpm fixtures:refresh  # regenerate tests/fixtures/scryfall/** from live Scryfall
+pnpm check:stories     # fails until every user story has an E2E spec (expected red until M3)
+```
 
 ## Conventions
 

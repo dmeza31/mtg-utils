@@ -336,10 +336,26 @@ Every file below is created in its epic's spec. This table is the target state a
 
 ## 7. Definition of Done
 
-- [ ] `pnpm test:unit` runs and reports coverage against the domain threshold.
-- [ ] `pnpm test:e2e` runs a passing smoke spec against the production build.
-- [ ] The MSW handlers and the Playwright `ScryfallMock` read the same fixture files.
-- [ ] `ScryfallMock` supports failure, rate-limit, delay, offline, and request counting.
-- [ ] `expectNoA11yViolations` passes on the placeholder page.
-- [ ] `check-story-coverage` runs in CI (it will fail loudly until M3 — that is correct and intended; it is the burn-down list).
-- [ ] Contract tests exist and are scheduled nightly, excluded from PR runs.
+- [x] `pnpm test:unit` runs and reports coverage against the domain threshold.
+- [x] `pnpm test:e2e` runs a passing smoke spec against the production build.
+- [x] The MSW handlers and the Playwright `ScryfallMock` read the same fixture files.
+- [x] `ScryfallMock` supports failure, rate-limit, delay, offline, and request counting.
+- [x] `expectNoA11yViolations` passes on the placeholder page.
+- [x] `check-story-coverage` runs in CI (it will fail loudly until M3 — that is correct and intended; it is the burn-down list).
+- [x] Contract tests exist and are scheduled nightly, excluded from PR runs.
+
+## 8. Deviations from this spec as written
+
+Recorded so later specs stay consistent with what actually exists (mirrors SPEC-000 §6).
+
+| # | Spec said | Reality | Why |
+|---|---|---|---|
+| 1 | `test:unit: "vitest run"` | `"vitest run --project unit --project dom --coverage"` | A bare `vitest run` would also run the `contract` project, hitting the live Scryfall API on every local/CI unit-test invocation. Coverage is on by default so the 90% domain gate can't be silently skipped. `test:watch` is scoped the same way (minus `--coverage`, for iteration speed). |
+| 2 | Fixture/mock paths via `import.meta.url` | Resolved via `process.cwd()` instead | Vitest runs test files as ESM, but Playwright's Node runtime transpiles them to CommonJS, where `import.meta` doesn't exist. `process.cwd()` (always the package root — every `pnpm` script and the CI `working-directory` guarantee it) is the one scheme both runners agree on. |
+| 3 | MSW handlers and Playwright `ScryfallMock` "read the same fixture files" | They also share the same resolution *logic*, via `tests/support/scryfallFixtureData.ts` | Stricter than the letter of the spec, cheaply: one function decides how a query resolves, and each transport layer (MSW `HttpResponse` vs Playwright `route.fulfill`) just wraps it. Removes a second place the two layers could disagree. |
+| 4 | — | Added `src/domain/export/attribution.test.ts` | Turning on the 90% domain coverage threshold immediately failed against SPEC-000's existing, untested `attribution.ts`. Closing that gap was in scope for "the coverage gate actually works," not a new feature. |
+| 5 | Scryfall fixtures implied to be hand-authored/curated | Generated from the **live** API via `scripts/refresh-scryfall-fixtures.ts` | Network access was available while building this spec, so fixtures are real API responses, not approximations. Along the way: `/cards/collection` resolves split cards (e.g. "Fire // Ice") by **front-face name only** — the combined form 404s. Recorded as a comment at the identifier list in the refresh script for whoever builds the resolver in SPEC-A. |
+| 6 | — | Contract tests (Task 6) were run against the live API during implementation (2026-08-05) and passed, including confirming the documented `/cards/collection` cap is exactly 75 identifiers. | Verifying the verifier — an untested contract test is exactly the kind of guard rail SPEC-000 warned about. |
+| 7 | Task 7 — `tests/support/builders.ts` (`aCard`/`aDeck`/`aMatchup`/`aPlan`) and Playwright page objects (`ImportPage`/`DeckPage`/`PlanPage`/`ExportDialog`) | **Deferred, not built** | Both need shapes that don't exist yet: the builders need `Card`/`Deck`/`Matchup`/`SideboardPlan` from SPEC-002 Task 1, and the page objects need DOM structure from the features SPEC-A/B/C/D/E each build. Writing either now means guessing a shape the later spec might not honor. Add `builders.ts` in SPEC-002 Task 1 alongside the types it wraps; add each page object in the spec that first builds that surface. |
+| 8 | `.github/workflows/ci.yml` had `unit`/`e2e` as a TODO, no contract/story-coverage jobs | Added `unit`, `e2e` (sharded 1/2, 2/2), `story-coverage`, and `contract` jobs to the **same** workflow, gated by `if: github.event_name != 'schedule'` / `== 'schedule'` off a new `schedule:` trigger | One file stays the single source of truth for the pipeline rather than splitting nightly-only jobs into a second workflow. |
+| 9 | — | E2E CI installs only `chromium`, `firefox`, `webkit` browser binaries | The `mobile` and `tablet` Playwright projects emulate device viewports on the Chromium/WebKit engines already installed — no fourth binary needed. |
