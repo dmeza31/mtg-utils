@@ -314,9 +314,22 @@ Inject the generator; do not call `crypto.randomUUID()` inline. Tests need deter
 
 ## 4. Definition of Done
 
-- [ ] `src/domain/**` has ≥ 90% line and branch coverage.
-- [ ] Not one file under `src/domain/` imports React, Next.js, `zustand`, or `fetch` (lint-enforced).
-- [ ] Plan actions have a property-based test proving quantities never exceed availability.
-- [ ] `FakeCardRepository` exists and is used by every domain test.
-- [ ] Store tests run without a DOM.
-- [ ] `reconcilePlan` keeps and flags broken entries rather than deleting them, with a test that would fail if someone "simplifies" it to a delete.
+- [x] `src/domain/**` has ≥ 90% line and branch coverage. (100% lines/branches/functions/statements as of implementation.)
+- [x] Not one file under `src/domain/` imports React, Next.js, `zustand`, or `fetch` (lint-enforced).
+- [x] Plan actions have a property-based test proving quantities never exceed availability.
+- [x] `FakeCardRepository` exists and is used by every domain test that needs a `CardRepository` (only `deck/validate.ts` takes one in this spec).
+- [x] Store tests run without a DOM.
+- [x] `reconcilePlan` keeps and flags broken entries rather than deleting them, with a test that would fail if someone "simplifies" it to a delete.
+
+## 5. Deviations from this spec as written
+
+Recorded so later specs stay consistent with what actually exists (mirrors SPEC-000 §6, SPEC-001 §8).
+
+| # | Spec said | Reality | Why |
+|---|---|---|---|
+| 1 | `PlanEntry` has no `broken` field (Task 1) | Added `readonly broken?: boolean` | Task 8's rule 3 ("keep the entry, mark it broken") needs somewhere to persist that flag on the entry itself so it survives beyond a single `reconcilePlan` call; the `ReconcileChange` list is ephemeral per-call, not part of the stored model. |
+| 2 | Task 1's type-level "deeply readonly" test uses a generic recursive `DeepReadonly<T>` | Used per-interface `Readonly<T>` equality checks plus explicit `readonly X[]` checks on every array field instead | A fully-generic recursive `DeepReadonly<T>` recurses into branded primitives (`CardId` structurally `extends object`) and blows past TypeScript's instantiation budget on a model this size, silently widening unrelated fields to `never`. The per-field approach covers the same ground without the recursion hazard. |
+| 3 | `tests/support/builders.ts` and Vitest resolve `@/*` implicitly | Added `resolve.alias` to every Vitest project in `vitest.config.ts` | Vitest doesn't read `tsconfig.json` paths on its own; each `projects` entry is an independent Vite config, so the alias has to be repeated per project rather than set once at the root. |
+| 4 | `tests/support/FakeCardRepository.ts` gets "written" (Task 2) | Also added `tests/support/FakeCardRepository.test.ts` and included `tests/support/**/*.test.ts` in the `unit` Vitest project | Cheap to verify the fake's own contract (batch resolve, per-name unresolved reporting, cache-only `peek`) directly, and every later domain test depends on this fake behaving correctly. |
+| 5 | Task 7's `validateDeck`/`DeckIssue` shape | No `severity` field on `DeckIssue` (unlike `PlanIssue` in Task 5) | FR-4 validation is advisory-only with no error/warning distinction in the requirements; adding one would be an unrequested feature. |
+| 6 | — | Added `zustand`, `zundo`, `fast-check` as dependencies | First specs to actually use them, per SPEC-000 §6 deviation 7's convention of installing a dependency in the spec that first needs it. |
