@@ -65,6 +65,13 @@ export interface Card {
   readonly faces?: readonly CardFace[];
   /** ISO 8601. Drives the FR-2.5 localStorage TTL. */
   readonly cachedAt: string;
+  /**
+   * SPEC-A FR-2.16 — set when oldest-print search (phase 2) found nothing
+   * for this card and the identity lookup's (phase 1) default-printing
+   * images were kept instead. Lets the UI be honest that the art shown
+   * isn't necessarily the oldest paper printing.
+   */
+  readonly printingFallback?: boolean;
 }
 
 export interface DeckEntry {

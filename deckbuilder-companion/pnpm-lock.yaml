@@ -17,6 +17,9 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
       zundo:
         specifier: ^2.3.0
         version: 2.3.0(zustand@5.0.14(@types/react@19.2.18)(react@19.2.8))

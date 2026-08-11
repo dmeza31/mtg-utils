@@ -117,19 +117,19 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "preview": {
         "source": "The Third Power",
         "source_uri": "https://www.mtgcast.com/podcasts/the-third-power/posts/the-third-power-episode-82-dragon-s-rage-channeler-our-exclusive-preview-for-modern-horizons-2-1f827c244c",
         "previewed_at": "2021-05-26"
       },
       "prices": {
-        "usd": "1.40",
-        "usd_foil": "2.52",
+        "usd": "1.85",
+        "usd_foil": "2.56",
         "usd_etched": null,
-        "eur": "1.33",
-        "eur_foil": "2.19",
-        "tix": "0.62"
+        "eur": "1.21",
+        "eur_foil": "2.33",
+        "tix": "0.58"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=522197&printed=false",
@@ -255,7 +255,7 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "prices": {
         "usd": null,
         "usd_foil": null,
@@ -383,12 +383,12 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "prices": {
         "usd": "2.24",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "1.65",
+        "eur": "1.55",
         "eur_foil": null,
         "tix": null
       },
@@ -518,7 +518,7 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "prices": {
         "usd": null,
         "usd_foil": null,
@@ -653,14 +653,14 @@
       "booster": false,
       "story_spotlight": false,
       "promo_types": ["boosterfun"],
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "prices": {
-        "usd": "4.11",
-        "usd_foil": "3.81",
+        "usd": "4.46",
+        "usd_foil": "3.82",
         "usd_etched": null,
-        "eur": "3.10",
-        "eur_foil": "3.61",
-        "tix": "1.17"
+        "eur": "2.90",
+        "eur_foil": "3.80",
+        "tix": "1.58"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DDragon%2527s%2BRage%2BChanneler",
@@ -787,12 +787,12 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "prices": {
-        "usd": "1.03",
+        "usd": "1.01",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "0.95",
+        "eur": "1.07",
         "eur_foil": null,
         "tix": "0.02"
       },
@@ -923,13 +923,13 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "prices": {
         "usd": "40.11",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "48.47",
-        "eur_foil": "58.98",
+        "eur": "47.59",
+        "eur_foil": "59.21",
         "tix": null
       },
       "related_uris": {
@@ -1059,13 +1059,13 @@
       "booster": false,
       "story_spotlight": false,
       "promo_types": ["raisedfoil"],
-      "edhrec_rank": 1800,
+      "edhrec_rank": 1806,
       "prices": {
         "usd": null,
-        "usd_foil": "55.37",
+        "usd_foil": "55.11",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "92.64",
+        "eur_foil": "96.91",
         "tix": null
       },
       "related_uris": {

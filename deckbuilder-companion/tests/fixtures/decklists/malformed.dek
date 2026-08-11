@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Deck xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <NetDeckID>0</NetDeckID>
+  <Cards CatID="12345" Quantity="4" Sideboard="false" Name="Lightning Bolt" Annotation="0" />
+  <Cards CatID="12346" Sideboard="false" Name="Monastery Swiftspear" Annotation="0" />
+  <Cards CatID="12347" Quantity="16" Sideboard="false" Annotation="0" />
+</Deck>

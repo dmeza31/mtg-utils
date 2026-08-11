@@ -135,7 +135,7 @@
         "usd": "620.00",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "413.17",
+        "eur": "409.41",
         "eur_foil": null,
         "tix": null
       },
@@ -280,7 +280,7 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "349.49",
+        "usd": "349.64",
         "usd_foil": null,
         "usd_etched": null,
         "eur": "281.00",
@@ -576,10 +576,10 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "2.30",
+        "usd": "2.36",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "2.67",
+        "eur": "2.80",
         "eur_foil": null,
         "tix": null
       },
@@ -694,7 +694,7 @@
         "usd": "49.82",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "12.72",
+        "eur": "12.67",
         "eur_foil": null,
         "tix": null
       },
@@ -985,10 +985,10 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "2.46",
+        "usd": "3.13",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "2.03",
+        "eur": "1.90",
         "eur_foil": null,
         "tix": null
       },
@@ -1103,7 +1103,7 @@
         "usd": "34.00",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "20.60",
+        "eur": "19.27",
         "eur_foil": null,
         "tix": null
       },
@@ -1696,7 +1696,7 @@
         "usd_etched": null,
         "eur": null,
         "eur_foil": null,
-        "tix": "1.92"
+        "tix": "2.44"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=159263&printed=false",
@@ -1845,9 +1845,9 @@
         "usd": "1.73",
         "usd_foil": "12.69",
         "usd_etched": null,
-        "eur": "1.45",
-        "eur_foil": "6.61",
-        "tix": "0.61"
+        "eur": "1.32",
+        "eur_foil": "5.55",
+        "tix": "0.71"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=191089&printed=false",
@@ -2140,10 +2140,10 @@
       "edhrec_rank": 160,
       "prices": {
         "usd": null,
-        "usd_foil": "31.08",
+        "usd_foil": "31.70",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "13.58",
+        "eur_foil": "13.55",
         "tix": null
       },
       "related_uris": {
@@ -2288,12 +2288,12 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "1.15",
-        "usd_foil": "4.43",
+        "usd": "1.12",
+        "usd_foil": "5.61",
         "usd_etched": null,
-        "eur": "1.42",
+        "eur": "1.36",
         "eur_foil": "6.12",
-        "tix": "0.54"
+        "tix": "0.55"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=205227&printed=false",
@@ -2441,7 +2441,7 @@
         "usd_etched": null,
         "eur": null,
         "eur_foil": null,
-        "tix": "0.65"
+        "tix": "0.78"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DLightning%2BBolt",
@@ -2588,7 +2588,7 @@
         "usd_etched": null,
         "eur": null,
         "eur_foil": null,
-        "tix": "6.52"
+        "tix": "6.22"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DLightning%2BBolt",
@@ -2733,10 +2733,10 @@
       "edhrec_rank": 160,
       "prices": {
         "usd": null,
-        "usd_foil": "1.39",
+        "usd_foil": "1.49",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "1.47",
+        "eur_foil": "1.45",
         "tix": null
       },
       "related_uris": {
@@ -3030,11 +3030,11 @@
       "edhrec_rank": 160,
       "prices": {
         "usd": "1.14",
-        "usd_foil": "2.47",
+        "usd_foil": "2.62",
         "usd_etched": null,
-        "eur": "1.25",
-        "eur_foil": "2.54",
-        "tix": "0.76"
+        "eur": "1.30",
+        "eur_foil": "2.39",
+        "tix": "0.69"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=397722&printed=false",
@@ -3178,10 +3178,10 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "1.39",
+        "usd": "1.36",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "1.28",
+        "eur": "1.60",
         "eur_foil": null,
         "tix": null
       },
@@ -3330,7 +3330,7 @@
         "usd_etched": null,
         "eur": null,
         "eur_foil": null,
-        "tix": "0.73"
+        "tix": "0.64"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DLightning%2BBolt",
@@ -3479,9 +3479,9 @@
         "usd": "1.42",
         "usd_foil": "2.25",
         "usd_etched": null,
-        "eur": "1.28",
+        "eur": "1.11",
         "eur_foil": "3.53",
-        "tix": "0.81"
+        "tix": "0.75"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=442130&printed=false",
@@ -3625,11 +3625,11 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "4.73",
-        "usd_foil": "6.83",
+        "usd": "4.66",
+        "usd_foil": "7.25",
         "usd_etched": null,
-        "eur": "4.13",
-        "eur_foil": "6.10",
+        "eur": "3.98",
+        "eur_foil": "6.44",
         "tix": null
       },
       "related_uris": {
@@ -3919,10 +3919,10 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "1.08",
+        "usd": "1.06",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "1.58",
+        "eur": "1.46",
         "eur_foil": null,
         "tix": null
       },
@@ -4075,11 +4075,11 @@
       },
       "prices": {
         "usd": null,
-        "usd_foil": "4.31",
+        "usd_foil": "4.26",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "6.15",
-        "tix": "0.97"
+        "eur_foil": "6.17",
+        "tix": "1.12"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=485315&printed=false",
@@ -4234,7 +4234,7 @@
         "usd_foil": "6.38",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "8.04",
+        "eur_foil": "7.93",
         "tix": "1.12"
       },
       "related_uris": {
@@ -4387,11 +4387,11 @@
       },
       "prices": {
         "usd": null,
-        "usd_foil": "4.80",
+        "usd_foil": "4.82",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "6.56",
-        "tix": "1.26"
+        "eur_foil": "6.42",
+        "tix": "0.96"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=485317&printed=false",
@@ -4543,10 +4543,10 @@
       },
       "prices": {
         "usd": null,
-        "usd_foil": "7.24",
+        "usd_foil": "6.94",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "8.37",
+        "eur_foil": "8.29",
         "tix": "0.97"
       },
       "related_uris": {
@@ -4696,10 +4696,10 @@
         "previewed_at": "2020-06-19"
       },
       "prices": {
-        "usd": "2.61",
+        "usd": "2.53",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "1.46",
+        "eur": "1.48",
         "eur_foil": null,
         "tix": null
       },
@@ -5004,12 +5004,12 @@
         "previewed_at": "2021-03-28"
       },
       "prices": {
-        "usd": "3.86",
-        "usd_foil": "5.97",
-        "usd_etched": "5.17",
-        "eur": "2.52",
+        "usd": "4.20",
+        "usd_foil": "6.04",
+        "usd_etched": "5.31",
+        "eur": "2.76",
         "eur_foil": "6.28",
-        "tix": "1.18"
+        "tix": "1.03"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=517592&printed=false",
@@ -5126,12 +5126,12 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "17.69",
-        "usd_foil": "23.85",
-        "usd_etched": "19.74",
-        "eur": "15.34",
+        "usd": "17.94",
+        "usd_foil": "23.96",
+        "usd_etched": "18.68",
+        "eur": "15.45",
         "eur_foil": "28.48",
-        "tix": "19.70"
+        "tix": "18.53"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DLightning%2BBolt",
@@ -5275,7 +5275,7 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "1.08",
+        "usd": "1.25",
         "usd_foil": null,
         "usd_etched": null,
         "eur": "1.50",
@@ -5427,11 +5427,11 @@
       "promo_types": ["sldbonus", "universesbeyond"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "9.11",
+        "usd": "9.12",
         "usd_foil": "9.56",
         "usd_etched": null,
         "eur": "7.45",
-        "eur_foil": "8.53",
+        "eur_foil": "8.36",
         "tix": null
       },
       "related_uris": {
@@ -5575,11 +5575,11 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "2.84",
-        "usd_foil": "2.66",
+        "usd": "3.50",
+        "usd_foil": "2.68",
         "usd_etched": null,
-        "eur": "1.46",
-        "eur_foil": "1.87",
+        "eur": "1.37",
+        "eur_foil": "1.77",
         "tix": null
       },
       "related_uris": {
@@ -5725,11 +5725,11 @@
       "promo_types": ["boosterfun"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "0.84",
-        "usd_foil": "1.87",
+        "usd": "0.74",
+        "usd_foil": "1.83",
         "usd_etched": null,
-        "eur": "1.58",
-        "eur_foil": "2.26",
+        "eur": "1.53",
+        "eur_foil": "2.43",
         "tix": null
       },
       "related_uris": {
@@ -5880,12 +5880,12 @@
         "previewed_at": "2022-06-19"
       },
       "prices": {
-        "usd": "2.70",
-        "usd_foil": "2.34",
+        "usd": "2.60",
+        "usd_foil": "2.50",
         "usd_etched": null,
         "eur": "1.61",
-        "eur_foil": "2.29",
-        "tix": "0.94"
+        "eur_foil": "2.22",
+        "tix": "0.67"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=571450&printed=false",
@@ -6036,11 +6036,11 @@
         "previewed_at": "2022-06-19"
       },
       "prices": {
-        "usd": "2.01",
-        "usd_foil": "2.31",
+        "usd": "2.07",
+        "usd_foil": "2.30",
         "usd_etched": null,
-        "eur": "2.38",
-        "eur_foil": "3.01",
+        "eur": "2.49",
+        "eur_foil": "3.25",
         "tix": null
       },
       "related_uris": {
@@ -6212,7 +6212,7 @@
       "mtgo_id": 102261,
       "name": "Lightning Bolt",
       "lang": "en",
-      "released_at": "2022-11-29",
+      "released_at": "2022-11-30",
       "uri": "https://api.scryfall.com/cards/8abac1f3-bdf5-42e2-b881-8023588978a0",
       "scryfall_uri": "https://scryfall.com/card/prm/102261/lightning-bolt?utm_source=api",
       "layout": "normal",
@@ -6484,10 +6484,10 @@
       "edhrec_rank": 160,
       "prices": {
         "usd": null,
-        "usd_foil": "13.84",
+        "usd_foil": "13.87",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "20.09",
+        "eur_foil": "20.37",
         "tix": null
       },
       "related_uris": {
@@ -6632,10 +6632,10 @@
       "story_spotlight": false,
       "edhrec_rank": 160,
       "prices": {
-        "usd": "2.81",
+        "usd": "2.78",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "1.86",
+        "eur": "1.83",
         "eur_foil": null,
         "tix": "0.02"
       },
@@ -6784,7 +6784,7 @@
       "promo_types": ["universesbeyond"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "3.01",
+        "usd": "3.03",
         "usd_foil": null,
         "usd_etched": null,
         "eur": "3.92",
@@ -6935,7 +6935,7 @@
       "edhrec_rank": 160,
       "prices": {
         "usd": null,
-        "usd_foil": "4.41",
+        "usd_foil": "4.33",
         "usd_etched": null,
         "eur": null,
         "eur_foil": null,
@@ -7085,7 +7085,7 @@
       "edhrec_rank": 160,
       "prices": {
         "usd": null,
-        "usd_foil": "58.74",
+        "usd_foil": "58.89",
         "usd_etched": null,
         "eur": null,
         "eur_foil": "95.86",
@@ -7233,11 +7233,11 @@
       "promo_types": ["rainbowfoil", "poster"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "4.33",
+        "usd": "4.34",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "3.09",
-        "eur_foil": "3.53",
+        "eur": "3.38",
+        "eur_foil": "3.56",
         "tix": null
       },
       "related_uris": {
@@ -7389,11 +7389,11 @@
         "previewed_at": "2024-10-18"
       },
       "prices": {
-        "usd": "3.65",
+        "usd": "3.71",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "2.85",
-        "eur_foil": "4.48",
+        "eur": "3.04",
+        "eur_foil": "4.28",
         "tix": null
       },
       "related_uris": {
@@ -7546,8 +7546,8 @@
         "usd": "4.94",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "3.90",
-        "eur_foil": "4.07",
+        "eur": "3.83",
+        "eur_foil": "4.10",
         "tix": null
       },
       "related_uris": {
@@ -7846,11 +7846,11 @@
       "promo_types": ["universesbeyond", "ffix"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "4.84",
+        "usd": "5.53",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "6.26",
-        "eur_foil": "5.68",
+        "eur": "5.85",
+        "eur_foil": "5.62",
         "tix": null
       },
       "related_uris": {
@@ -8001,12 +8001,12 @@
       "promo_types": ["sourcematerial", "ffxiii", "universesbeyond", "boosterfun"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "0.99",
-        "usd_foil": "2.19",
+        "usd": "1.14",
+        "usd_foil": "2.14",
         "usd_etched": null,
-        "eur": "1.62",
-        "eur_foil": "2.63",
-        "tix": "0.75"
+        "eur": "1.56",
+        "eur_foil": "2.75",
+        "tix": "0.77"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DLightning%2BBolt",
@@ -8149,10 +8149,10 @@
       "edhrec_rank": 160,
       "prices": {
         "usd": null,
-        "usd_foil": "5.18",
+        "usd_foil": "5.21",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "4.55",
+        "eur_foil": "4.58",
         "tix": null
       },
       "related_uris": {
@@ -8299,11 +8299,11 @@
       "promo_types": ["universesbeyond"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "7.59",
+        "usd": "7.67",
         "usd_foil": null,
         "usd_etched": null,
         "eur": "8.12",
-        "eur_foil": "9.39",
+        "eur_foil": "9.52",
         "tix": null
       },
       "related_uris": {
@@ -8452,11 +8452,11 @@
       "promo_types": ["sourcematerial", "universesbeyond", "boosterfun"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "3.77",
-        "usd_foil": "12.47",
+        "usd": "4.35",
+        "usd_foil": "12.38",
         "usd_etched": null,
-        "eur": "3.90",
-        "eur_foil": "9.62",
+        "eur": "4.12",
+        "eur_foil": "9.70",
         "tix": "1.76"
       },
       "related_uris": {
@@ -8602,10 +8602,10 @@
       "promo_types": ["wizardsplaynetwork", "standardshowdown", "universesbeyond"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "2.30",
-        "usd_foil": "23.20",
+        "usd": "2.24",
+        "usd_foil": "21.01",
         "usd_etched": null,
-        "eur": "1.97",
+        "eur": "1.76",
         "eur_foil": "4.60",
         "tix": null
       },
@@ -8759,8 +8759,8 @@
         "previewed_at": "2026-03-26"
       },
       "prices": {
-        "usd": "2.37",
-        "usd_foil": "2.01",
+        "usd": "2.26",
+        "usd_foil": "1.98",
         "usd_etched": null,
         "eur": "4.54",
         "eur_foil": "4.74",
@@ -8917,10 +8917,10 @@
       },
       "prices": {
         "usd": null,
-        "usd_foil": "3.85",
+        "usd_foil": "3.74",
         "usd_etched": null,
         "eur": null,
-        "eur_foil": "5.80",
+        "eur_foil": "5.61",
         "tix": null
       },
       "related_uris": {
@@ -9055,14 +9055,14 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 8748,
+      "edhrec_rank": 8603,
       "prices": {
-        "usd": "1.44",
-        "usd_foil": "1.76",
+        "usd": "1.49",
+        "usd_foil": "1.84",
         "usd_etched": null,
-        "eur": "1.72",
-        "eur_foil": "2.48",
-        "tix": "1.03"
+        "eur": "1.52",
+        "eur_foil": "2.21",
+        "tix": "0.89"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DEmeritus%2Bof%2BConflict%2B%252F%252F%2BLightning%2BBolt",
@@ -9196,19 +9196,19 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 8748,
+      "edhrec_rank": 8603,
       "preview": {
         "source": "Collider",
         "source_uri": "https://collider.com/magic-the-gathering-secrets-of-strixhaven-card-preview-first-look-images/",
         "previewed_at": "2026-04-03"
       },
       "prices": {
-        "usd": "3.13",
-        "usd_foil": "3.99",
+        "usd": "3.12",
+        "usd_foil": "3.68",
         "usd_etched": null,
-        "eur": "2.86",
-        "eur_foil": "3.48",
-        "tix": "1.81"
+        "eur": "2.31",
+        "eur_foil": "3.17",
+        "tix": "1.72"
       },
       "related_uris": {
         "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DEmeritus%2Bof%2BConflict%2B%252F%252F%2BLightning%2BBolt",
@@ -9340,9 +9340,9 @@
       "booster": false,
       "story_spotlight": false,
       "promo_types": ["promopack", "stamped"],
-      "edhrec_rank": 8748,
+      "edhrec_rank": 8603,
       "prices": {
-        "usd": "5.72",
+        "usd": "5.47",
         "usd_foil": "5.27",
         "usd_etched": null,
         "eur": "1.17",
@@ -9494,11 +9494,11 @@
       "promo_types": ["universesbeyond"],
       "edhrec_rank": 160,
       "prices": {
-        "usd": "0.82",
-        "usd_foil": "2.55",
+        "usd": "0.76",
+        "usd_foil": "2.69",
         "usd_etched": null,
         "eur": "1.60",
-        "eur_foil": "1.49",
+        "eur_foil": "1.78",
         "tix": "0.02"
       },
       "related_uris": {
