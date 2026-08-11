@@ -4,9 +4,10 @@
  * here poisons all of SPEC-D's sideboard-plan clamping.
  */
 import { describe, expect, it } from "vitest";
-import { aDeck } from "../../../tests/support/builders";
+import { aCard, aDeck } from "../../../tests/support/builders";
+import { FakeCardRepository } from "../../../tests/support/FakeCardRepository";
 import { toCardId } from "../model/types";
-import { copiesOf, countCards, distinctCardIds, totalCopiesIn75 } from "./queries";
+import { copiesOf, countCards, distinctCardIds, resolveEntries, totalCopiesIn75 } from "./queries";
 
 const bolt = toCardId("card-lightning-bolt");
 const rip = toCardId("card-rest-in-peace");
@@ -90,5 +91,39 @@ describe("distinctCardIds", () => {
       ],
     });
     expect(distinctCardIds(deck)).toEqual([bolt, rip]);
+  });
+});
+
+describe("resolveEntries (SPEC-B task B-1 foundation)", () => {
+  it("joins each entry in the given zone with its resolved Card", async () => {
+    const boltCard = aCard({ oracleId: bolt, name: "Lightning Bolt" });
+    const repo = new FakeCardRepository([boltCard]);
+    await repo.resolve([{ name: "Lightning Bolt" }]);
+
+    const deck = aDeck({ maindeck: [{ cardId: bolt, quantity: 4 }], sideboard: [] });
+    expect(resolveEntries(deck, "maindeck", repo)).toEqual([
+      { cardId: bolt, card: boltCard, quantity: 4, zone: "maindeck" },
+    ]);
+  });
+
+  it("excludes an entry whose card is unresolved (peek returns undefined)", async () => {
+    const repo = new FakeCardRepository([]);
+    const deck = aDeck({ maindeck: [{ cardId: bolt, quantity: 4 }], sideboard: [] });
+    expect(resolveEntries(deck, "maindeck", repo)).toEqual([]);
+  });
+
+  it("only returns entries from the requested zone", async () => {
+    const boltCard = aCard({ oracleId: bolt, name: "Lightning Bolt" });
+    const ripCard = aCard({ oracleId: rip, name: "Rest in Peace" });
+    const repo = new FakeCardRepository([boltCard, ripCard]);
+    await repo.resolve([{ name: "Lightning Bolt" }, { name: "Rest in Peace" }]);
+
+    const deck = aDeck({
+      maindeck: [{ cardId: bolt, quantity: 4 }],
+      sideboard: [{ cardId: rip, quantity: 2 }],
+    });
+    expect(resolveEntries(deck, "sideboard", repo)).toEqual([
+      { cardId: rip, card: ripCard, quantity: 2, zone: "sideboard" },
+    ]);
   });
 });
