@@ -14,9 +14,16 @@
  * `DeckView` sits outside the `max-w-2xl` intro column so its responsive
  * grid (2 to 8 columns, FR-3.9/NFR-3.2) can use the root layout's full
  * `max-w-7xl` width instead of being capped to intro-text-reading width.
+ *
+ * SPEC-C adds the matchup sidebar + detail below the deck view, once a deck
+ * exists — matchups technically don't require a deck (SPEC-C §2), but the
+ * product flow described in the story specs is import → view deck → plan
+ * matchups, so the section follows that order.
  */
 import { DeckView } from "@/features/deck/DeckView";
 import { ImportScreen } from "@/features/import/ImportScreen";
+import { MatchupDetail } from "@/features/matchup/MatchupDetail";
+import { MatchupSidebar } from "@/features/matchup/MatchupSidebar";
 import { useWorkspaceState } from "@/state/WorkspaceProvider";
 
 export default function Home() {
@@ -38,7 +45,16 @@ export default function Home() {
         </div>
         <ImportScreen />
       </div>
-      {deck !== undefined ? <DeckView /> : null}
+
+      {deck !== undefined ? (
+        <>
+          <DeckView />
+          <div className="grid gap-6 md:grid-cols-[260px_1fr]">
+            <MatchupSidebar />
+            <MatchupDetail />
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

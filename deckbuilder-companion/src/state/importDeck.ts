@@ -27,6 +27,13 @@ export interface ImportDeckOptions {
   /** Used only to decide `.dek` XML vs. plain text (FR-1.3). */
   readonly fileName?: string;
   readonly deckName?: string;
+  /**
+   * SPEC-C task C-7 — an opponent decklist is excluded from FR-4 validation:
+   * a 62-card list the user typed from memory isn't a problem to report.
+   * Defaults to `true` so every other caller (the workspace deck, this
+   * option's only caller before SPEC-C) is unaffected.
+   */
+  readonly validate?: boolean;
 }
 
 export interface MatchupReconciliation {
@@ -142,7 +149,7 @@ export async function previewImport(
     sourceText,
   };
 
-  const issues = validateDeck(deck, repository);
+  const issues = options.validate === false ? [] : validateDeck(deck, repository);
   const status: ImportPreview["status"] =
     resolveResult.unresolved.length > 0 || issues.length > 0 ? "partial" : "ready";
   store.setState({ status });
