@@ -155,13 +155,19 @@ export function ImportScreen() {
           }}
           placeholder={"4 Lightning Bolt\n4 Monastery Swiftspear\n..."}
         />
-        <div className="mt-2 flex items-center gap-3">
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          {/* `min-w-0` overrides the flex item default of `min-width: auto`,
+              which otherwise refuses to let a native file input shrink
+              below its "Choose File" button + filename's intrinsic content
+              width — the exact cause of horizontal overflow at 320px
+              (NFR-3.2) that this input's default sizing would otherwise
+              produce regardless of the flex container's own width. */}
           <input
             type="file"
             accept=".txt,.dek"
             aria-label="Upload a decklist file"
             data-testid="import-file-input"
-            className="text-sm"
+            className="max-w-full min-w-0 text-sm"
             onChange={onFileInputChange}
           />
           {fileName ? <span className="text-muted-foreground text-sm">{fileName}</span> : null}
