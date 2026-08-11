@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Deck xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <NetDeckID>0</NetDeckID>
+  <PreconstructedDeckID>0</PreconstructedDeckID>
+  <Cards CatID="12345" Quantity="4" Sideboard="false" Name="Lightning Bolt" Annotation="0" />
+  <Cards CatID="12346" Quantity="4" Sideboard="false" Name="Monastery Swiftspear" Annotation="0" />
+  <Cards CatID="12347" Quantity="16" Sideboard="false" Name="Mountain" Annotation="0" />
+  <Cards CatID="12348" Quantity="3" Sideboard="true" Name="Rest in Peace" Annotation="0" />
+  <Cards CatID="12349" Quantity="2" Sideboard="true" Name="Alpine Moon" Annotation="0" />
+</Deck>

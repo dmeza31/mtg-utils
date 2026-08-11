@@ -44,6 +44,11 @@ async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
 
 // The card pool referenced across tests/fixtures/decklists/*.txt. Kept as one
 // list so the collection fixture and the decklists never drift apart.
+// SPEC-A extended this from the original 22-card SPEC-002 pool to every
+// distinct real card name across every decklist fixture, since the A1 E2E
+// spec pastes whole fixtures and expects them to fully resolve against the
+// mock. "Lightnin Bolt" (the deliberate typo) and the two junk lines in
+// malformed.txt are intentionally absent — they exist to stay unresolved.
 const COLLECTION_NAMES = [
   "Lightning Bolt",
   "Monastery Swiftspear",
@@ -70,6 +75,30 @@ const COLLECTION_NAMES = [
   "Mountain",
   "Island",
   "Steam Vents",
+  "Abrade",
+  "Alpine Moon",
+  "Blood Moon",
+  "Boros Charm",
+  "Chalice of the Void",
+  "Deflecting Palm",
+  "Dress Down",
+  "Fiery Cannonade",
+  "Fiery Islet",
+  "Lava Spike",
+  "Molten Rain",
+  "Prismatic Ending",
+  "Ragavan, Nimble Pilferer",
+  "Rest in Peace",
+  "Rift Bolt",
+  "Scalding Tarn",
+  "Searing Blaze",
+  "Searing Blood",
+  "Skewer the Critics",
+  "Smash to Smithereens",
+  "Spell Pierce",
+  "Spirebluff Canal",
+  "Sunbaked Canyon",
+  "Wild Slash",
 ];
 
 async function refreshCollection() {

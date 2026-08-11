@@ -120,15 +120,15 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
-        "usd": "2.59",
-        "usd_foil": "57.81",
+        "usd": "2.56",
+        "usd_foil": "59.72",
         "usd_etched": null,
-        "eur": "1.99",
-        "eur_foil": "52.11",
-        "tix": "0.82"
+        "eur": "1.96",
+        "eur_foil": "56.17",
+        "tix": "0.97"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=27165&printed=false",
@@ -260,7 +260,7 @@
       "booster": false,
       "story_spotlight": false,
       "promo_types": ["tourney", "fnm"],
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
         "usd": null,
@@ -398,13 +398,13 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
         "usd": "0.32",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "0.33",
+        "eur": "0.34",
         "eur_foil": null,
         "tix": "1.01"
       },
@@ -534,7 +534,7 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
         "usd": "0.27",
@@ -671,7 +671,7 @@
       "textless": false,
       "booster": false,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
         "usd": null,
@@ -806,15 +806,15 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
         "usd": "0.22",
-        "usd_foil": "0.25",
+        "usd_foil": "0.26",
         "usd_etched": null,
-        "eur": "0.23",
+        "eur": "0.25",
         "eur_foil": "0.19",
-        "tix": "0.37"
+        "tix": "0.12"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=456821&printed=false",
@@ -941,13 +941,13 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
-        "usd": "0.31",
+        "usd": "0.32",
         "usd_foil": null,
         "usd_etched": null,
-        "eur": "0.20",
+        "eur": "0.25",
         "eur_foil": null,
         "tix": null
       },
@@ -1079,7 +1079,7 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "preview": {
         "source": "Luis Scott-Vargas",
@@ -1087,12 +1087,12 @@
         "previewed_at": "2021-05-28"
       },
       "prices": {
-        "usd": "0.28",
+        "usd": "0.30",
         "usd_foil": "0.58",
-        "usd_etched": "0.54",
-        "eur": "0.23",
+        "usd_etched": "0.53",
+        "eur": "0.29",
         "eur_foil": "1.58",
-        "tix": "0.28"
+        "tix": "0.23"
       },
       "related_uris": {
         "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=526261&printed=false",
@@ -1223,13 +1223,13 @@
       "textless": false,
       "booster": true,
       "story_spotlight": false,
-      "edhrec_rank": 12770,
+      "edhrec_rank": 12798,
       "penny_rank": 393,
       "prices": {
-        "usd": "0.18",
+        "usd": "0.17",
         "usd_foil": "0.33",
         "usd_etched": null,
-        "eur": "0.21",
+        "eur": "0.17",
         "eur_foil": "0.72",
         "tix": "0.33"
       },

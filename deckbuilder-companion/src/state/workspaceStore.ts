@@ -5,7 +5,7 @@
  *
  * Wrapped with zundo (FR-8.9) partialized to `workspace` only, so undo/redo
  * never touches `status` — restoring an old `workspace` into a stale
- * "importing" or "error" status would be a bug.
+ * "resolving" or "error" status would be a bug.
  */
 import { temporal } from "zundo";
 import { createStore } from "zustand/vanilla";
@@ -20,7 +20,14 @@ import type {
 } from "../domain/model/types";
 import type { PlanContext } from "../domain/plan/actions";
 
-export type WorkspaceStatus = "empty" | "importing" | "ready" | "error";
+/**
+ * SPEC-A Task A-9 extends this with `parsing`/`resolving`/`partial` — the
+ * granular progress states `importDeck` (`src/state/importDeck.ts`) drives
+ * so the UI can show real loading state instead of a spinner of unknown
+ * duration. `partial` means the deck imported but has unresolved names or
+ * validation warnings (FR-4.4 — advisory, never blocking).
+ */
+export type WorkspaceStatus = "empty" | "parsing" | "resolving" | "ready" | "partial" | "error";
 
 export interface WorkspaceState {
   readonly workspace: Workspace;
