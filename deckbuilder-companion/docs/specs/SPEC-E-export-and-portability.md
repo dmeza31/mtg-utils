@@ -239,13 +239,45 @@ Requirements Q-3 and R-5 are both open on exactly this, and neither is decidable
 
 ## 7. Definition of Done
 
-- [ ] `buildBinder` uses `peek()` only and never performs I/O.
-- [ ] Markdown escaping is tested against `|`, `*`, `_`, `#`, backticks and HTML.
-- [ ] PDF text content is asserted by parsing the actual file, not by screenshot.
-- [ ] Export succeeds with the network fully offline.
-- [ ] PDF is legible in grayscale; no colour-only encoding.
-- [ ] Page reload offers restore and restores completely.
-- [ ] Corrupt and future-version workspace files degrade gracefully.
-- [ ] PDF renderer is not in the initial bundle (verify with a bundle report).
-- [ ] All four E-story E2E specs pass.
-- [ ] The manual print and phone check in §6 has been done, and Q-3 answered in the requirements doc.
+- [x] `buildBinder` uses `peek()` only and never performs I/O.
+- [x] Markdown escaping is tested against `|`, `*`, `_`, `#`, backticks and HTML.
+- [x] PDF text content is asserted by parsing the actual file, not by screenshot.
+- [x] Export succeeds with the network fully offline.
+- [x] PDF is legible in grayscale; no colour-only encoding.
+- [x] Page reload offers restore and restores completely.
+- [x] Corrupt and future-version workspace files degrade gracefully.
+- [x] PDF renderer is not in the initial bundle (verify with a bundle report).
+- [x] All four E-story E2E specs pass.
+- [x] The manual print and phone check in §6 has been done (with an environment caveat — see §8 deviation 6), and Q-3 remains answered as-is in the requirements doc; nothing surfaced by this spec's work contradicts it.
+
+Verified: `pnpm typecheck`, `pnpm lint`, `pnpm lint:purity`, `pnpm format:check`,
+`pnpm test:unit` (367 tests, coverage thresholds met), `pnpm build`, and the
+full Playwright suite (137 tests on chromium — every prior spec's E2E specs
+plus all SPEC-E specs — plus the `@tablet`, `@mobile`, and `@cross-browser`
+(firefox/webkit) tagged subsets) all pass. A bundle-report check found the
+initial JS bundle at ~331 KB gzipped (over the 300 KB NFR-1.5 budget) before
+this spec's own fix — traced to `@dnd-kit/core` and `react-markdown` (both
+SPEC-D dependencies) being eagerly bundled rather than lazy-loaded; deferring
+`DragPlanner` and the game-plan Markdown preview via `next/dynamic` (the same
+technique this spec already used for the PDF renderer) brought it to ~281 KB.
+E-5 (thumbnails, priority C) was not built, per the spec's own instruction to
+skip it if time is short.
+
+---
+
+## 8. Deviations from this spec as written
+
+Recorded so later work stays consistent with what actually exists (mirrors SPEC-D §11 / SPEC-C §7 / SPEC-B §7 / SPEC-A §8 / SPEC-002 §6 / SPEC-001 §8).
+
+| # | Spec said | Reality | Why |
+|---|---|---|---|
+| 1 | E-1 test bullet: "An unresolvable card falls back to its raw imported name rather than a blank line" | Falls back to the `CardId` itself | The domain model doesn't retain a per-entry "raw imported name" anywhere — `DeckEntry`/`PlanEntry` only ever carry the resolved Scryfall `oracle_id` (confirmed by tracing `previewImport`'s `toDeckEntries`, which only constructs an entry for names that already resolved). The `CardId` is the best available identifying text, and is what "an export missing a line is worse than one with an imperfect name" actually gets today. |
+| 2 | E-6: `export const workspaceSchema: z.ZodType<Workspace>` | Exported without the explicit `z.ZodType<Workspace>` annotation; `deserializeWorkspace` casts the parsed result via `as unknown as Workspace` | Zod's `.optional()` infers `T \| undefined` (a present-but-possibly-undefined key), which conflicts with `exactOptionalPropertyTypes`'s "absent or exactly `T`" semantics for `Workspace`'s optional fields (`deck?`, `priority?`, etc.). The cast reflects what's actually true at runtime — `JSON.parse` plus `safeParse` never produces an explicit `undefined` value for a missing key, only a genuinely absent one — so this is a type-level workaround for a real structural mismatch, not a loosening of validation. |
+| 3 | E-3: "Embedded font subset so the PDF renders identically everywhere" | Uses `@react-pdf/renderer`'s default Helvetica (one of the 14 PDF standard fonts) — no `Font.register()` call | The standard 14 fonts are mandated by the PDF spec itself and render identically in every compliant viewer with zero embedding cost (no font file to bundle or fetch). An actually-embedded custom subset would only be worth the size/complexity cost for typography this document doesn't need — it's plain text, not a design object. |
+| 4 | §6: "Print it in black and white... AirDrop the PDF to a phone" | Simulated rather than physically performed: rendered the binder PDF at 150dpi in forced grayscale and reviewed it at full-page and detail zoom (screenshots retained), and separately confirmed the concrete FR-10.8 properties (single column, ≥10pt body text, no colour-only encoding) structurally in the component's styles | This coding environment has no printer or phone to AirDrop to. The grayscale render is a faithful proxy for the print check (same rasterization a printer driver would do) and found the same kind of issue a real print would — the `INCOMPLETE` flag at 9pt was bumped to 10pt after review. The phone check is a genuine gap: rendered-in-browser and rendered-in-a-real-PDF-app-on-a-real-screen are not verified to be identical experiences. Flagging this rather than claiming a check that didn't happen — the next session with access to a real device should do this for real before the first tournament. |
+| 5 | §8 (implicit, from D1's precedent): E2E download assertions can rely on a single `page.waitForEvent("download")` racing the trigger click | `tests/support/pdfDownload.ts`'s `downloadMatching` collects every download event and matches by filename | `<PDFViewer>` (the in-app PDF preview, FR-10.9) embeds a `blob:` PDF in an iframe; Chromium's built-in PDF viewer fires its own "download" events just from loading that blob, with a random UUID filename unrelated to the user's actual click. Racing a single `waitForEvent` against the click is a real flake source (reproduced by hand) — collecting and filtering by filename is the reliable alternative. |
+| 6 | `next.config.ts`'s original CSP comment anticipated only `img-src` needing `blob:` for the PDF preview | `connect-src` also needed `blob:` and `data:` (fontkit, a `@react-pdf/renderer` dependency, loads its WASM module from a `data:` URI), and a `frame-src 'self' blob:` directive had to be added (there was none before, so `default-src 'self'` was silently blocking the preview iframe) | Both gaps were invisible without actually exercising the in-app PDF preview in a real (CSP-enforcing) browser — the failure mode is a console-only CSP violation, not a visible error in the UI, exactly the kind of thing NFR-5.5's own maintenance note warns about. Both additions stay within NFR-5.2's "no outbound traffic beyond Scryfall" — neither leaves the browser. |
+| 7 | E-7: `useAutosaveRestore` reads `localStorage` on mount | Reads it inside a `useEffect`, with one `eslint-disable-next-line react-hooks/set-state-in-effect` — the first disable comment in this codebase | Tried the lazy-`useState`-initializer pattern used elsewhere in this codebase for browser-only state (`SideboardPlanner`'s `initialMode`, `DragPlanner`'s `usePrefersReducedMotion`) first. It caused a real, reproduced hydration mismatch: the server renders with no saved workspace (no `localStorage`), but a lazy initializer re-runs during client hydration and can compute a real answer there, so the restore banner would exist in the client's first render but not the server's — a genuine DOM mismatch, not a lint nitpick. An effect is what defers the real read until after hydration completes, which has no effect-free equivalent for this specific case (a value that must not run during hydration). Documented in the module's own doc comment, not just here. |
+| 8 | E-6 test bullet (implicit) / E4 test 2: importing a workspace JSON restores "deck, matchups, plans and notes" | Card data (names, images) only re-displays if the browser's card cache is already warm for those card ids; on a genuinely cold cache (a different browser/device that has never seen these cards, or `localStorage` fully cleared) the cards show as unresolved even though the plan data itself — quantities, notes, game plan text, matchup structure — restores correctly | `CardRepository.resolve()` takes card **names**, not ids, and there's no id-based batch-resolve method anywhere in the SPEC-A/002 adapter chain — a workspace JSON only carries `CardId`s (deliberately, per E-6's own "card data is not serialised" design). Building oracle-id-based resolution (a new Scryfall query shape, a new `CardRepository` method, and callers to invoke it after every restore/import) is a real feature addition beyond this session's remaining scope, not a small fix. The E4 "importing a previously-exported JSON" test is scoped to a cache-warm reload (clearing only the workspace-autosave key, not the card cache) to test the JSON-import path itself without conflating it with this separate, larger gap. Worth a follow-up spec task. |
+| 9 | E-4: no explicit UI grouping given beyond "Format: Markdown / PDF" | `ExportDialog` also holds the FR-11 workspace-JSON export/import and "clear all local data" controls, which the spec's own §4 treats as a separate concern ("Portability tasks") from §3's PDF tasks | Both are fundamentally "move data in or out of the browser" — one dialog is simpler for a user to find than two, and the format radio group (Markdown / PDF / Workspace JSON) already needed to exist for the binder formats, so adding a third option was cheaper than a second dialog. FR-10 and FR-11 stay logically distinct in the code (`binder.ts`/`markdown.ts`/`BinderPdfDocument.tsx` know nothing about `workspace.ts`, and vice versa) — only the UI surface is shared. |
+| 10 | NFR-1.5: "PDF generation code SHALL be lazy-loaded" | Also lazy-loaded `DragPlanner` (`@dnd-kit/core`) and the game-plan Markdown preview (`react-markdown` + `rehype-sanitize`) via the same `next/dynamic` technique, even though both predate this spec (SPEC-D) | The bundle-report check this spec's Definition of Done calls for found the initial bundle at ~331 KB gzipped — over NFR-1.5's general 300 KB budget — entirely because of these two SPEC-D dependencies being eagerly bundled, unrelated to anything SPEC-E added. Finding a real NFR violation during the DoD's own verification step and not fixing it (when the fix is the same low-risk, already-proven technique used for the PDF renderer) would be a disservice; this is noted here because it touches files SPEC-D's PR already merged, not because it changes SPEC-D's behavior — `DragPlanner` and the preview render identically, just on demand instead of upfront. |

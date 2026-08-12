@@ -92,7 +92,15 @@ test("a fully-boarded-out 4-of is no longer draggable (FR-7.4) @tablet", async (
   const source = plannerPage.sourceCard(plannerPage.maindeckSource, "Lightning Bolt");
 
   for (let i = 0; i < 4; i += 1) {
+    // Four rapid consecutive drags on the same element — dnd-kit plays a
+    // drop animation after each one (only skipped under
+    // prefers-reduced-motion) and doesn't accept the next drag's pointerdown
+    // until it finishes, so back-to-back drags with no gap silently drop the
+    // last one. A real user dragging four different physical copies doesn't
+    // hit this; a test script issuing four drags in the same tick does.
+    await expect(source.getByTestId("plan-card-subtitle")).toHaveText(`${4 - i} left`);
     await dragCardTo(page, source, plannerPage.outZone);
+    await page.waitForTimeout(400);
   }
 
   await expect(source.getByTestId("plan-card-subtitle")).toHaveText("0 left");

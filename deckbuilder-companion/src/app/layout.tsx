@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { DeckViewPreferencesProvider } from "@/features/deck/DeckViewPreferences";
 import { LegalFooter } from "@/features/legal/LegalFooter";
+import { AutosaveGate } from "@/features/workspace/AutosaveGate";
 import { WorkspaceProvider } from "@/state/WorkspaceProvider";
 import "./globals.css";
 
@@ -36,7 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WorkspaceProvider>
           <DeckViewPreferencesProvider>
             <SiteHeader />
-            <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">{children}</main>
+            <AutosaveGate>
+              <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">{children}</main>
+            </AutosaveGate>
             <LegalFooter />
           </DeckViewPreferencesProvider>
         </WorkspaceProvider>

@@ -8,14 +8,34 @@
  * functions, so FR-9.6 (mode-switch preserves the plan exactly) holds by
  * construction — see Task D-7.
  */
+import nextDynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { DragPlanner } from "@/features/plan/drag/DragPlanner";
 import { ListPlanner } from "@/features/plan/list/ListPlanner";
 import { ValidationBar } from "@/features/plan/ValidationBar";
 import { PostBoardPreview } from "@/features/plan/PostBoardPreview";
 import type { PlanContext } from "@/domain/plan/actions";
 import type { Deck, Matchup, PlanVariant, SideboardPlan } from "@/domain/model/types";
 import { useUndoRedo, useWorkspaceStoreApi } from "@/state/WorkspaceProvider";
+
+/**
+ * SPEC-E bundle-size fix (NFR-1.5) — `@dnd-kit/core` was eagerly bundled
+ * into every page load via this import, even for users who never get past
+ * the import screen. List mode is a fully equivalent view over the same
+ * plan (§2), so deferring drag mode's code until it's actually selected
+ * costs nothing functionally and was most of what pushed the initial
+ * bundle over the 300 KB gzipped budget.
+ */
+const DragPlanner = nextDynamic(
+  () => import("@/features/plan/drag/DragPlanner").then((m) => m.DragPlanner),
+  {
+    ssr: false,
+    loading: () => (
+      <p className="text-muted-foreground p-4 text-sm" data-testid="drag-planner-loading">
+        Loading drag mode…
+      </p>
+    ),
+  },
+);
 
 export interface SideboardPlannerProps {
   readonly matchup: Matchup;
