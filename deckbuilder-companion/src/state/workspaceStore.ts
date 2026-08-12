@@ -72,6 +72,8 @@ export interface WorkspaceState {
   /** SPEC-C task C-7 — reuses the SPEC-A import path; commits to the matchup, not `workspace.deck`. */
   setOpponentDeck(id: MatchupId, deck: Deck): void;
   removeOpponentDeck(id: MatchupId): void;
+  /** SPEC-E task E-7 — replaces the whole workspace (autosave restore, FR-11.2/FR-11.4 import). */
+  restoreWorkspace(ws: Workspace): void;
 }
 
 const EMPTY_PLAN: SideboardPlan = { out: [], in: [] };
@@ -314,6 +316,10 @@ export function createWorkspaceStore(idFactory: IdFactory) {
               ),
             },
           }));
+        },
+
+        restoreWorkspace: (ws) => {
+          set({ workspace: ws, status: ws.deck === undefined ? "empty" : "ready" });
         },
       }),
       {

@@ -10,8 +10,16 @@ import type { NextConfig } from "next";
  *
  * - `img-src` needs `blob:` for the in-app PDF preview (FR-10.9) and `data:` for
  *   thumbnails embedded at export time (FR-10.11).
+ * - `frame-src 'self' blob:` (SPEC-E) — `@react-pdf/renderer`'s `<PDFViewer>`
+ *   (the in-app PDF preview, FR-10.9) renders into an `<iframe>` pointing at a
+ *   `blob:` URL; without this it's silently blocked (no console-visible broken
+ *   image, just a CSP frame-ancestors-style violation logged to console).
  * - `connect-src` is deliberately narrow: NFR-5.2 says the only outbound traffic
- *   is to Scryfall. Widening it means re-reading that requirement first.
+ *   is to Scryfall. `blob:` and `data:` are added (SPEC-E) for two purely local,
+ *   no-network cases the wording still has to cover: the PDF preview iframe
+ *   loading its own `blob:` document, and `fontkit` (a `@react-pdf/renderer`
+ *   dependency) loading its WASM module from a `data:` URI. Neither leaves the
+ *   browser. Widening beyond that means re-reading NFR-5.2 first.
  * - `script-src` allows 'unsafe-inline'/'unsafe-eval' because Next injects inline
  *   bootstrap scripts. Tightening this needs nonce-based middleware; tracked as
  *   post-v1 hardening rather than done half-way here.
@@ -22,7 +30,8 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://cards.scryfall.io",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.scryfall.com",
+  "connect-src 'self' blob: data: https://api.scryfall.com",
+  "frame-src 'self' blob:",
   "form-action 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",

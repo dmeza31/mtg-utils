@@ -193,6 +193,22 @@ describe("workspaceStore (SPEC-002 Task 9)", () => {
     expect(matchup?.plans.unified?.out).toEqual([{ cardId: bolt, quantity: 3 }]);
   });
 
+  it("restoreWorkspace (SPEC-E task E-7) replaces the whole workspace and sets status ready when it has a deck", () => {
+    const store = aStore();
+    store.getState().addMatchup("stale");
+
+    store.getState().restoreWorkspace({ schemaVersion: 1, deck, matchups: [] });
+
+    expect(store.getState().workspace).toEqual({ schemaVersion: 1, deck, matchups: [] });
+    expect(store.getState().status).toBe("ready");
+  });
+
+  it("restoreWorkspace sets status empty when the restored workspace has no deck", () => {
+    const store = aStore();
+    store.getState().restoreWorkspace({ schemaVersion: 1, matchups: [] });
+    expect(store.getState().status).toBe("empty");
+  });
+
   it("undo/redo round-trips through the temporal middleware without touching status", () => {
     const store = aStore();
     store.getState().addMatchup("A");

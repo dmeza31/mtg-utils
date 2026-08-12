@@ -6,11 +6,11 @@ Import an MTGO decklist, build a sideboard plan per matchup, export it for the t
 
 ## Read this first
 
-| What                | Where                                                   |
-| ------------------- | ------------------------------------------------------- |
-| **What** to build   | `docs/requirements/requirements.md`                     |
-| **How** to build it | `docs/specs/` — start at `docs/specs/README.md`         |
-| Current progress    | SPEC-000–002, SPEC-A, SPEC-B, SPEC-C, SPEC-D done. SPEC-E next. |
+| What                | Where                                             |
+| ------------------- | ------------------------------------------------- |
+| **What** to build   | `docs/requirements/requirements.md`               |
+| **How** to build it | `docs/specs/` — start at `docs/specs/README.md`   |
+| Current progress    | SPEC-000–002, SPEC-A–E done. v1 feature-complete. |
 
 Specs are written to be opened cold. To start a session:
 

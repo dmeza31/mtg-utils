@@ -21,6 +21,7 @@
  * matchups, so the section follows that order.
  */
 import { DeckView } from "@/features/deck/DeckView";
+import { ExportDialog } from "@/features/export/ExportDialog";
 import { ImportScreen } from "@/features/import/ImportScreen";
 import { MatchupDetail } from "@/features/matchup/MatchupDetail";
 import { MatchupSidebar } from "@/features/matchup/MatchupSidebar";
@@ -33,9 +34,12 @@ export default function Home() {
     <div className="space-y-8">
       <div className="max-w-2xl space-y-6">
         <div className="space-y-2">
-          <h1 className="text-foreground text-2xl font-semibold tracking-tight">
-            {deck?.name ?? "Deckbuilder Companion"}
-          </h1>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-foreground text-2xl font-semibold tracking-tight">
+              {deck?.name ?? "Deckbuilder Companion"}
+            </h1>
+            <ExportDialog />
+          </div>
           {deck === undefined ? (
             <p className="text-muted-foreground">
               Import an MTGO decklist, build a sideboard plan for every matchup you expect to face,

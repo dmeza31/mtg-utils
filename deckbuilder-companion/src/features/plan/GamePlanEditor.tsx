@@ -6,11 +6,19 @@
  * `rehype-sanitize` on the preview is what makes `<script>` in a pasted
  * game plan inert rather than executed (NFR-5.3).
  */
+import nextDynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeSanitize from "rehype-sanitize";
 import type { MatchupId } from "@/domain/model/types";
 import { useWorkspaceStoreApi } from "@/state/WorkspaceProvider";
+
+const GamePlanPreview = nextDynamic(() => import("./GamePlanPreview"), {
+  ssr: false,
+  loading: () => (
+    <p className="text-muted-foreground p-4 text-sm" data-testid="game-plan-preview-loading">
+      Loading preview…
+    </p>
+  ),
+});
 
 export interface GamePlanEditorProps {
   readonly matchupId: MatchupId;
@@ -77,12 +85,7 @@ export function GamePlanEditor({ matchupId, gamePlan }: GamePlanEditorProps) {
       </div>
 
       {previewOpen ? (
-        <div
-          data-testid="game-plan-preview"
-          className="border-border bg-muted/30 min-h-32 w-full rounded-md border p-2 text-sm [&_em]:italic [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5"
-        >
-          <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{draft}</ReactMarkdown>
-        </div>
+        <GamePlanPreview text={draft} />
       ) : (
         <textarea
           data-testid="game-plan-editor"
