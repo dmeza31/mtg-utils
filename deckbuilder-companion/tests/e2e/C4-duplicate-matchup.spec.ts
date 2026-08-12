@@ -35,13 +35,13 @@ test("duplicating a matchup produces '<name> (copy)' with the same game plan", a
   const matchupPage = new MatchupPage(page);
   await importDeck(page, importPage);
   await matchupPage.addMatchup("Izzet Murktide");
-  await page.getByTestId("matchup-game-plan").fill("Race them.");
+  await page.getByTestId("game-plan-editor").fill("Race them.");
 
   await matchupPage.itemByName("Izzet Murktide").getByTestId("matchup-duplicate-button").click();
 
   await expect(matchupPage.itemByName("Izzet Murktide (copy)")).toBeVisible();
   await matchupPage.itemByName("Izzet Murktide (copy)").click();
-  await expect(page.getByTestId("matchup-game-plan")).toHaveValue("Race them.");
+  await expect(page.getByTestId("game-plan-editor")).toHaveValue("Race them.");
 });
 
 test("editing the copy's game plan leaves the source unchanged (the aliasing assertion)", async ({
@@ -51,14 +51,14 @@ test("editing the copy's game plan leaves the source unchanged (the aliasing ass
   const matchupPage = new MatchupPage(page);
   await importDeck(page, importPage);
   await matchupPage.addMatchup("Izzet Murktide");
-  await page.getByTestId("matchup-game-plan").fill("Original plan.");
+  await page.getByTestId("game-plan-editor").fill("Original plan.");
 
   await matchupPage.itemByName("Izzet Murktide").getByTestId("matchup-duplicate-button").click();
   await matchupPage.itemByName("Izzet Murktide (copy)").click();
-  await page.getByTestId("matchup-game-plan").fill("Edited copy plan.");
+  await page.getByTestId("game-plan-editor").fill("Edited copy plan.");
 
   await matchupPage.itemByName("Izzet Murktide").click();
-  await expect(page.getByTestId("matchup-game-plan")).toHaveValue("Original plan.");
+  await expect(page.getByTestId("game-plan-editor")).toHaveValue("Original plan.");
 });
 
 test("duplicating carries tags and priority across", async ({ page }) => {

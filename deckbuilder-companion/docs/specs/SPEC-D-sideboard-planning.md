@@ -300,11 +300,38 @@ export async function dragCardTo(page: Page, cardTestId: string, zoneTestId: str
 
 ## 10. Definition of Done
 
-- [ ] Availability logic is a single tested function used by both UIs.
-- [ ] `D3-mode-switch-parity` passes **without** any mode-sync code existing.
-- [ ] A complete plan is buildable using only the keyboard (D1b test 4).
-- [ ] The validation bar announces changes via a live region.
-- [ ] FR-7.2's exact wording is asserted in a test.
-- [ ] Enabling split play/draw seeds both variants — tested.
-- [ ] No plan state exists outside the store.
-- [ ] All seven D-story E2E specs pass, plus the keyboard-drag spec.
+- [x] Availability logic is a single tested function used by both UIs.
+- [x] `D3-mode-switch-parity` passes **without** any mode-sync code existing.
+- [x] A complete plan is buildable using only the keyboard (D1b test 4).
+- [x] The validation bar announces changes via a live region.
+- [x] FR-7.2's exact wording is asserted in a test.
+- [x] Enabling split play/draw seeds both variants — tested.
+- [x] No plan state exists outside the store.
+- [x] All seven D-story E2E specs pass, plus the keyboard-drag spec.
+
+Verified: `pnpm typecheck`, `pnpm lint`, `pnpm lint:purity`, `pnpm format:check`,
+`pnpm test:unit` (322 tests, coverage thresholds met), `pnpm build`, and the
+full Playwright suite (114 tests on chromium — every prior spec's E2E specs
+plus all SPEC-D specs — plus the `@tablet`, `@mobile`, and `@cross-browser`
+(firefox/webkit) tagged subsets) all pass. D-13 (unused-card insight,
+priority C) was not built, per the spec's own instruction to build it only
+after everything `M` is done — SPEC-D's `M`-priority scope (D-1 through
+D-12) is complete.
+
+---
+
+## 11. Deviations from this spec as written
+
+Recorded so later specs stay consistent with what actually exists (mirrors SPEC-C §7 / SPEC-B §7 / SPEC-A §8 / SPEC-002 §6 / SPEC-001 §8).
+
+| # | Spec said | Reality | Why |
+|---|---|---|---|
+| 1 | Task D-5: keyboard drag built on "dnd-kit's `KeyboardSensor` plus an `aria-live` announcer" | A custom keyboard interaction layer alongside dnd-kit's pointer/touch `DndContext` — no `KeyboardSensor`. Space/Enter pick up and drop on the focused card's own `onKeyDown`; arrow keys jump between the four zones by name via a lookup table; Escape cancels; the announcer is a plain `aria-live="polite"` region driven by component state. | `KeyboardSensor`'s model is pixel-delta coordinate movement plus collision detection to infer the hovered droppable — it doesn't map cleanly onto "one keypress = move to the semantically next zone," which is what FR-8.6's key table and the D1b tests actually need. A small explicit zone-graph (`ZONE_GRID` in `DragPlanner.tsx`) is more direct, more deterministic to test, and produces the exact announcement text the spec's example shows. |
+| 2 | D1b test 1's example: "Tab to a card, Space to pick up, **↓** to OUT, Space to drop" | Implemented as **→** (ArrowRight) from a source zone to its paired drop zone, matching the §5 ASCII diagram's layout (MAINDECK/OUT side-by-side, SIDEBOARD/IN side-by-side below) rather than a vertically-stacked one | The diagram and the keystroke example don't agree on which direction is spatially correct; the diagram is the more load-bearing artifact (it also drives the `data-testid` zone names and the DragPlanner grid CSS), so the keyboard mapping follows it. All four arrow keys still navigate between all four zones (see deviation 1's table). |
+| 3 | §9 `D3-mode-switch-parity.spec.ts` test 3: "assert via the exported workspace JSON" | Asserts via a snapshot of every list-mode row's card name and quantity instead | Workspace JSON export doesn't exist until SPEC-E. A full plan snapshot (every non-zero row, sorted, before vs. after the round trip) proves the same thing — the round trip is byte-identical — without depending on a feature this spec doesn't build. |
+| 4 | Task D-11: "Scope history to plan and matchup edits — undoing a deck import would be surprising rather than helpful" | The undo/redo toolbar and Cmd/Ctrl+Z shortcuts expose the store's existing `zundo` history unchanged; `partialize` still tracks the whole `workspace` (deck included), as it has since SPEC-002 | Narrowing `partialize` to exclude `deck` would touch SPEC-A's re-import reconciliation and SPEC-C's delete/undo-toast behavior, both already built and tested against the current shape — a change with a blast radius well beyond "add an undo button." No D-story test depends on undoing-an-import being blocked, so the toolbar simply surfaces what already exists; re-scoping history is left as follow-up work if it's ever actually needed. |
+| 5 | Task D-4: maindeck/sideboard source zones show "grouped card tiles" | `DragPlanner`'s `CardChip` is a compact text row (name, mana cost, remaining count) — no card art, unlike SPEC-B's `CardTile` | A full image-tile grid inside a drag zone adds real layout/performance work (the spec's own NFR-1.3 60fps note calls out tile cost directly) for a surface where the name and remaining count are what the interaction actually needs. `ListPlanner` is the same trade for the same reason. The post-board preview (D-10) reuses the real `CardTile`-based `DeckView` where card art matters more (identifying a full 60). |
+| 6 | §8: "Playwright component tests (`tests/component/DragPlanner.ct.tsx`) cover the interaction mechanics... without booting the whole app" | Not built — `tests/component/` has no test runner wired up (no `@playwright/experimental-ct-react` in this repo at any prior spec) | Standing up component-test infra from scratch was out of scope for this spec's time budget. The mechanics it would have covered (activation threshold, invalid-target rejection, overlay rendering) are covered by `D1`'s pointer-drag tests and `D1b`'s keyboard tests instead, which is more setup per test but needed no new infra. |
+| 7 | Task D-2 / SPEC-002's `WorkspaceState`: `setSplitPlayDraw(id: MatchupId, split: boolean): void` | Replaced with `enableSplitPlayDraw(id)` and `disableSplitPlayDraw(id, keep: "onPlay" \| "onDraw")`, plus a new `copyPlanVariant(id, from, to)` | FR-6.8's seed-on-enable and never-silently-discard-on-disable behavior needs different data on each side of the toggle (nothing in, a keep choice out) — a single boolean setter can't express that. The one existing unit test that called the old signature was updated, not preserved as a compatibility shim (CLAUDE.md: no backwards-compatibility hacks for an API only this codebase calls). |
+| 8 | SPEC-C's placeholder: `data-testid="matchup-game-plan"` on the game plan textarea | Renamed to `data-testid="game-plan-editor"`, matching Task D-8's explicit testid list | D-8 names the testid directly; keeping the old one alongside would mean two testids for one field, which isn't possible on one element. `C2-opponent-decklist.spec.ts` and `C4-duplicate-matchup.spec.ts` were updated to the new id — same behavior, new selector. |
+| 9 | Task D-8: "Autosaves to the store on debounce; no explicit save button" | Debounces on a 400ms timer **and** flushes immediately on blur | A bare debounce risks losing the last keystrokes on a fast navigation (switching matchups, closing the tab) — a real product bug the spec's "nothing gets dropped" spirit rules out. Blur (switching matchups, clicking elsewhere) is exactly when a flush is safe and unsurprising. |

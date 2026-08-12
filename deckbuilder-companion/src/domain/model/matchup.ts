@@ -5,7 +5,7 @@
  * that a rule appearing in the store belongs in the domain instead.
  */
 import type { IdFactory } from "./ids";
-import type { Matchup, PlanEntry, SideboardPlan } from "./types";
+import type { Matchup, PlanEntry, PlanVariant, SideboardPlan } from "./types";
 
 const EMPTY_PLAN: SideboardPlan = { out: [], in: [] };
 const PLAN_VARIANTS = ["unified", "onPlay", "onDraw"] as const;
@@ -61,6 +61,39 @@ export function duplicateMatchup(ids: IdFactory, source: Matchup): Matchup {
     name: `${source.name} (copy)`,
     plans: copyPlans(source.plans),
   };
+}
+
+/**
+ * SPEC-D Task D-9 (FR-6.8) — enabling the split seeds *both* variants from
+ * the existing unified plan. The naive "two empty plans" implementation
+ * silently discards the user's work; this is why the spec calls the
+ * behaviour out explicitly rather than leaving it to "toggle a boolean".
+ */
+export function enableSplitPlayDraw(matchup: Matchup): Matchup {
+  const unified = matchup.plans.unified ?? EMPTY_PLAN;
+  return {
+    ...matchup,
+    splitPlayDraw: true,
+    plans: { ...matchup.plans, onPlay: copyPlan(unified), onDraw: copyPlan(unified) },
+  };
+}
+
+export type SplitKeepChoice = "onPlay" | "onDraw";
+
+/** Disabling never discards silently — the caller must say which variant becomes `unified`. */
+export function disableSplitPlayDraw(matchup: Matchup, keep: SplitKeepChoice): Matchup {
+  const kept = matchup.plans[keep] ?? EMPTY_PLAN;
+  return {
+    ...matchup,
+    splitPlayDraw: false,
+    plans: { ...matchup.plans, unified: copyPlan(kept) },
+  };
+}
+
+/** D-9's "copy from other variant" action — the two plans usually differ by a card or two. */
+export function copyPlanVariant(matchup: Matchup, from: PlanVariant, to: PlanVariant): Matchup {
+  const source = matchup.plans[from] ?? EMPTY_PLAN;
+  return { ...matchup, plans: { ...matchup.plans, [to]: copyPlan(source) } };
 }
 
 /** Bounds-checked array move; returns the original array unchanged for a no-op or out-of-range move. */

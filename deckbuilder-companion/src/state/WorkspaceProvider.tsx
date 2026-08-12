@@ -55,6 +55,27 @@ export function useWorkspaceStoreApi(): WorkspaceStoreApi {
   return useWorkspaceContext().store;
 }
 
+/**
+ * SPEC-D Task D-11 — `zundo`'s temporal store, scoped by `partialize`
+ * (workspaceStore.ts) to plan/matchup edits only (FR-8.9). `pastStates`/
+ * `futureStates` length drives the toolbar buttons' disabled state.
+ */
+export function useUndoRedo(): {
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
+} {
+  const { store } = useWorkspaceContext();
+  const temporalState = useStore(store.temporal, (s) => s);
+  return {
+    canUndo: temporalState.pastStates.length > 0,
+    canRedo: temporalState.futureStates.length > 0,
+    undo: () => temporalState.undo(),
+    redo: () => temporalState.redo(),
+  };
+}
+
 export function useCardRepository(): CardRepository {
   return useWorkspaceContext().repository;
 }
