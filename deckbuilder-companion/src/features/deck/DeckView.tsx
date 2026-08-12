@@ -9,6 +9,7 @@
 import { useEffect, useState } from "react";
 import { countCards, resolveEntries } from "@/domain/deck/queries";
 import { groupEntries, type GroupBy } from "@/domain/deck/group";
+import type { Deck } from "@/domain/model/types";
 import { sortEntries, type SortBy } from "@/domain/deck/sort";
 import { useCardRepository, useWorkspaceState } from "@/state/WorkspaceProvider";
 import { useDeckViewPreferences } from "./DeckViewPreferences";
@@ -46,15 +47,24 @@ function useIsTabletOrWider(): boolean {
   return matches;
 }
 
-export function DeckView() {
-  const deck = useWorkspaceState((s) => s.workspace.deck);
+export interface DeckViewProps {
+  /** SPEC-C task C-7 — an opponent's deck, rendered instead of `workspace.deck`. */
+  readonly deck?: Deck;
+  /** SPEC-C task C-7 — hides grouping/sort/layout controls and the statistics panel for the matchup's opponent-deck panel. */
+  readonly compact?: boolean;
+}
+
+export function DeckView({ deck: deckProp, compact = false }: DeckViewProps) {
+  const workspaceDeck = useWorkspaceState((s) => s.workspace.deck);
+  const deck = deckProp ?? workspaceDeck;
   const repo = useCardRepository();
   const { groupBy, setGroupBy, sortBy, setSortBy, layout, setLayout } = useDeckViewPreferences();
   const isTabletOrWider = useIsTabletOrWider();
 
   if (deck === undefined) return null;
 
-  const effectiveLayout: DeckLayout = layout === "stacked" && isTabletOrWider ? "stacked" : "grid";
+  const effectiveLayout: DeckLayout =
+    !compact && layout === "stacked" && isTabletOrWider ? "stacked" : "grid";
 
   const maindeckEntries = sortEntries(resolveEntries(deck, "maindeck", repo), sortBy);
   const sideboardEntries = sortEntries(resolveEntries(deck, "sideboard", repo), sortBy);
@@ -68,55 +78,57 @@ export function DeckView() {
           Maindeck {countCards(deck.maindeck)} · Sideboard {countCards(deck.sideboard)}
         </p>
 
-        <div className="flex flex-wrap items-center gap-3 text-sm">
-          <label className="flex items-center gap-2">
-            <span className="text-muted-foreground">Group by</span>
-            <select
-              data-testid="deck-group-by"
-              className="border-border bg-background rounded-md border px-2 py-1"
-              value={groupBy}
-              onChange={(event) => setGroupBy(event.target.value as GroupBy)}
-            >
-              {GROUP_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+        {!compact ? (
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <label className="flex items-center gap-2">
+              <span className="text-muted-foreground">Group by</span>
+              <select
+                data-testid="deck-group-by"
+                className="border-border bg-background rounded-md border px-2 py-1"
+                value={groupBy}
+                onChange={(event) => setGroupBy(event.target.value as GroupBy)}
+              >
+                {GROUP_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className="flex items-center gap-2">
-            <span className="text-muted-foreground">Sort by</span>
-            <select
-              data-testid="deck-sort-by"
-              className="border-border bg-background rounded-md border px-2 py-1"
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value as SortBy)}
-            >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="flex items-center gap-2">
+              <span className="text-muted-foreground">Sort by</span>
+              <select
+                data-testid="deck-sort-by"
+                className="border-border bg-background rounded-md border px-2 py-1"
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value as SortBy)}
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className="hidden items-center gap-2 md:flex">
-            <span className="text-muted-foreground">Layout</span>
-            <select
-              data-testid="deck-layout"
-              className="border-border bg-background rounded-md border px-2 py-1"
-              value={layout}
-              onChange={(event) => setLayout(event.target.value as DeckLayout)}
-            >
-              <option value="grid">Grid</option>
-              <option value="stacked">Stacked</option>
-            </select>
-          </label>
-        </div>
+            <label className="hidden items-center gap-2 md:flex">
+              <span className="text-muted-foreground">Layout</span>
+              <select
+                data-testid="deck-layout"
+                className="border-border bg-background rounded-md border px-2 py-1"
+                value={layout}
+                onChange={(event) => setLayout(event.target.value as DeckLayout)}
+              >
+                <option value="grid">Grid</option>
+                <option value="stacked">Stacked</option>
+              </select>
+            </label>
+          </div>
+        ) : null}
       </div>
 
-      <StatisticsPanel deck={deck} repo={repo} />
+      {!compact ? <StatisticsPanel deck={deck} repo={repo} /> : null}
 
       <section aria-labelledby="maindeck-heading">
         <h2 id="maindeck-heading" className="text-foreground mb-3 text-lg font-semibold">

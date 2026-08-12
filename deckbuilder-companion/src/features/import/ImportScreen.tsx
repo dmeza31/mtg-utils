@@ -5,8 +5,16 @@
  * confirm/cancel step and reconciliation summary live in `ParseSummary` /
  * this component's post-commit state (tasks A-11, A-13); "Did you mean X?"
  * corrections live in `UnresolvedNameCorrections` (task A-12).
+ *
+ * SPEC-C Task C-7 generalizes this with a `variant` prop rather than
+ * forking it for the opponent-decklist panel: same parser, same
+ * repository, same unresolved-name UI, same `ParseSummary` — only the
+ * commit target (`workspace.deck` vs. `matchup.opponentDeck`) and whether
+ * FR-4 validation runs differ. Default `variant="workspace"` is
+ * byte-for-byte the same behaviour SPEC-A shipped.
  */
 import { useCallback, useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import type { MatchupId } from "@/domain/model/types";
 import {
   useCardRepository,
   useIdFactory,
@@ -31,13 +39,26 @@ const CHANGE_LABEL: Record<MatchupReconciliation["changes"][number]["kind"], str
   moved: "moved to a different zone",
 };
 
-export function ImportScreen() {
+export interface ImportScreenProps {
+  /** SPEC-C task C-7 — `"opponent"` commits to `matchup.opponentDeck` and skips FR-4 validation. */
+  readonly variant?: "workspace" | "opponent";
+  /** Required when `variant === "opponent"`. */
+  readonly matchupId?: MatchupId;
+}
+
+export function ImportScreen({ variant = "workspace", matchupId }: ImportScreenProps) {
   const store = useWorkspaceStoreApi();
   const repository = useCardRepository();
   const idFactory = useIdFactory();
   const status = useWorkspaceState((s) => s.status);
-  const hasExistingDeck = useWorkspaceState((s) => s.workspace.deck !== undefined);
+  const workspaceDeck = useWorkspaceState((s) => s.workspace.deck);
   const matchups = useWorkspaceState((s) => s.workspace.matchups);
+
+  const testIdBase = variant === "opponent" ? "opponent-import" : "import";
+  const hasExisting =
+    variant === "opponent"
+      ? matchups.find((m) => m.id === matchupId)?.opponentDeck !== undefined
+      : workspaceDeck !== undefined;
 
   const [text, setText] = useState("");
   const [fileName, setFileName] = useState<string | undefined>(undefined);
@@ -53,16 +74,13 @@ export function ImportScreen() {
   const runPreview = useCallback(
     async (input: string, name: string | undefined) => {
       setReconciliations(undefined);
-      const result = await previewImport(
-        store,
-        repository,
-        idFactory,
-        input,
-        name ? { fileName: name } : {},
-      );
+      const result = await previewImport(store, repository, idFactory, input, {
+        ...(name ? { fileName: name } : {}),
+        validate: variant === "workspace",
+      });
       setPreview(result);
     },
-    [store, repository, idFactory],
+    [store, repository, idFactory, variant],
   );
 
   const readFile = useCallback(async (file: File) => {
@@ -102,13 +120,22 @@ export function ImportScreen() {
   }, [runPreview, text, fileName]);
 
   const handleConfirm = useCallback(() => {
-    if (preview === undefined) return;
-    const { reconciliations: changes } = commitImport(store, preview);
-    setReconciliations(changes);
+    if (preview?.deck === undefined) return;
+
+    if (variant === "opponent") {
+      if (matchupId !== undefined) {
+        store.getState().setOpponentDeck(matchupId, preview.deck);
+      }
+      setReconciliations(undefined);
+    } else {
+      const { reconciliations: changes } = commitImport(store, preview);
+      setReconciliations(changes);
+    }
+
     setPreview(undefined);
     setText("");
     setFileName(undefined);
-  }, [store, preview]);
+  }, [store, preview, variant, matchupId]);
 
   const handleCancel = useCallback(() => {
     setPreview(undefined);
@@ -133,20 +160,23 @@ export function ImportScreen() {
   }, [runPreview, text, fileName]);
 
   return (
-    <div className="space-y-4" data-testid="import-screen">
+    <div className="space-y-4" data-testid={`${testIdBase}-screen`}>
       <div
         className="border-border rounded-md border border-dashed p-4"
         onDragOver={(event) => event.preventDefault()}
         onDrop={onDrop}
-        data-testid="import-dropzone"
+        data-testid={`${testIdBase}-dropzone`}
       >
-        <label className="text-foreground block text-sm font-medium" htmlFor="import-textarea">
-          Paste a decklist
+        <label
+          className="text-foreground block text-sm font-medium"
+          htmlFor={`${testIdBase}-textarea`}
+        >
+          {variant === "opponent" ? "Paste the opponent's decklist" : "Paste a decklist"}
         </label>
         <textarea
-          id="import-textarea"
+          id={`${testIdBase}-textarea`}
           ref={textareaRef}
-          data-testid="import-textarea"
+          data-testid={`${testIdBase}-textarea`}
           className="border-border bg-background mt-2 h-64 w-full rounded-md border p-3 font-mono text-sm"
           value={text}
           onChange={(event) => {
@@ -166,33 +196,38 @@ export function ImportScreen() {
             type="file"
             accept=".txt,.dek"
             aria-label="Upload a decklist file"
-            data-testid="import-file-input"
+            data-testid={`${testIdBase}-file-input`}
             className="max-w-full min-w-0 text-sm"
             onChange={onFileInputChange}
           />
           {fileName ? <span className="text-muted-foreground text-sm">{fileName}</span> : null}
         </div>
         {fileError ? (
-          <p role="alert" data-testid="import-file-error" className="mt-2 text-sm text-red-600">
+          <p
+            role="alert"
+            data-testid={`${testIdBase}-file-error`}
+            className="mt-2 text-sm text-red-600"
+          >
             {fileError}
           </p>
         ) : null}
       </div>
 
-      {hasExistingDeck && preview === undefined ? (
+      {hasExisting && preview === undefined ? (
         <p
           role="status"
-          data-testid="import-reimport-warning"
+          data-testid={`${testIdBase}-reimport-warning`}
           className="text-muted-foreground text-sm"
         >
-          Importing will replace your current deck. Sideboard plans referencing removed or reduced
-          cards will be flagged, not deleted.
+          {variant === "opponent"
+            ? "Importing will replace this matchup's opponent deck."
+            : "Importing will replace your current deck. Sideboard plans referencing removed or reduced cards will be flagged, not deleted."}
         </p>
       ) : null}
 
       <button
         type="button"
-        data-testid="import-submit"
+        data-testid={`${testIdBase}-submit`}
         className="bg-foreground text-background rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
         disabled={text.trim() === "" || isBusy}
         onClick={handleImportClick}

@@ -103,6 +103,19 @@ describe("previewImport", () => {
     );
   });
 
+  it("skips FR-4 validation when validate: false is passed (SPEC-C task C-7, opponent decks)", async () => {
+    const { store, repository, idFactory } = setup([bolt]);
+
+    const preview = await previewImport(store, repository, idFactory, "4 Lightning Bolt", {
+      validate: false,
+    });
+
+    expect(preview.issues).toEqual([]);
+    // Still resolves fine — only validation is skipped, not resolution.
+    expect(preview.status).toBe("ready");
+    expect(preview.deck?.maindeck).toEqual([{ cardId: bolt.oracleId, quantity: 4 }]);
+  });
+
   it("reports status error and produces no deck when nothing parses", async () => {
     const { store, repository, idFactory } = setup([bolt]);
 

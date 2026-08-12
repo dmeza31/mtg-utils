@@ -1,7 +1,9 @@
 /**
- * SPEC-002 Task 9. Tested directly against the vanilla `createStore` — no
- * React, no rendering. The store must hold no business logic: `editPlan`
- * just locates state and calls the domain function it's given.
+ * SPEC-002 Task 9 / SPEC-C Task C-3. Tested directly against the vanilla
+ * `createStore` — no React, no rendering. The store must hold no business
+ * logic: `editPlan` just locates state and calls the domain function it's
+ * given, and the matchup CRUD actions now delegate to
+ * `src/domain/model/matchup.ts` (SPEC-C task C-1).
  */
 import { describe, expect, it } from "vitest";
 import { addOut } from "../domain/plan/actions";
@@ -35,15 +37,28 @@ function aStore() {
 }
 
 describe("workspaceStore (SPEC-002 Task 9)", () => {
-  it("addMatchup returns a usable id and appends the matchup", () => {
+  it("addMatchup returns a usable id and appends the matchup with an initialized unified plan", () => {
     const store = aStore();
 
     const id = store.getState().addMatchup("UR Murktide");
 
     expect(id).toBe("id-1");
     expect(store.getState().workspace.matchups).toEqual([
-      { id: "id-1", name: "UR Murktide", tags: [], gamePlan: "", splitPlayDraw: false, plans: {} },
+      {
+        id: "id-1",
+        name: "UR Murktide",
+        tags: [],
+        gamePlan: "",
+        splitPlayDraw: false,
+        plans: { unified: { out: [], in: [] } },
+      },
     ]);
+  });
+
+  it("addMatchup rejects a whitespace-only name (FR-5.2)", () => {
+    const store = aStore();
+    expect(() => store.getState().addMatchup("   ")).toThrow(/name/i);
+    expect(store.getState().workspace.matchups).toEqual([]);
   });
 
   it("duplicateMatchup deep-copies the plan so editing the copy doesn't touch the original", () => {
@@ -121,6 +136,13 @@ describe("workspaceStore (SPEC-002 Task 9)", () => {
     expect(store.getState().workspace.matchups.map((m) => m.name)).toEqual(["Renamed", "Second"]);
   });
 
+  it("renameMatchup rejects a whitespace-only name (FR-5.2)", () => {
+    const store = aStore();
+    const id = store.getState().addMatchup("Original");
+    expect(() => store.getState().renameMatchup(id, "   ")).toThrow(/name/i);
+    expect(store.getState().workspace.matchups[0]?.name).toBe("Original");
+  });
+
   it("reorderMatchups moves a matchup to a new position", () => {
     const store = aStore();
     store.getState().addMatchup("A");
@@ -154,5 +176,125 @@ describe("workspaceStore (SPEC-002 Task 9)", () => {
 
     store.temporal.getState().redo();
     expect(store.getState().workspace.matchups).toHaveLength(1);
+  });
+});
+
+describe("workspaceStore — selection (SPEC-C task C-3)", () => {
+  it("starts with no matchup selected", () => {
+    const store = aStore();
+    expect(store.getState().selectedMatchupId).toBeUndefined();
+  });
+
+  it("addMatchup makes the new matchup the selected one", () => {
+    const store = aStore();
+    const first = store.getState().addMatchup("First");
+    expect(store.getState().selectedMatchupId).toBe(first);
+
+    const second = store.getState().addMatchup("Second");
+    expect(store.getState().selectedMatchupId).toBe(second);
+  });
+
+  it("selectMatchup changes the selection to an existing matchup", () => {
+    const store = aStore();
+    const first = store.getState().addMatchup("First");
+    const second = store.getState().addMatchup("Second");
+
+    store.getState().selectMatchup(first);
+    expect(store.getState().selectedMatchupId).toBe(first);
+    void second;
+  });
+
+  it("selectMatchup on a nonexistent id is a no-op", () => {
+    const store = aStore();
+    const first = store.getState().addMatchup("First");
+
+    store.getState().selectMatchup(toMatchupId("nope"));
+    expect(store.getState().selectedMatchupId).toBe(first);
+  });
+
+  it("removing the selected matchup selects the neighbour at the same index", () => {
+    const store = aStore();
+    store.getState().addMatchup("A");
+    store.getState().addMatchup("B");
+    const c = store.getState().addMatchup("C");
+    store.getState().selectMatchup(c);
+
+    // Removing the last matchup (index 2, now with nothing after it) should
+    // select its new neighbour — the matchup now at the end of the list.
+    store.getState().removeMatchup(c);
+    const remaining = store.getState().workspace.matchups;
+    expect(store.getState().selectedMatchupId).toBe(remaining[remaining.length - 1]?.id);
+  });
+
+  it("removing a middle selected matchup selects the one now at its index", () => {
+    const store = aStore();
+    store.getState().addMatchup("A");
+    const b = store.getState().addMatchup("B");
+    store.getState().addMatchup("C");
+    store.getState().selectMatchup(b);
+
+    store.getState().removeMatchup(b);
+    const remaining = store.getState().workspace.matchups.map((m) => m.name);
+    expect(remaining).toEqual(["A", "C"]);
+    const selected = store
+      .getState()
+      .workspace.matchups.find((m) => m.id === store.getState().selectedMatchupId);
+    expect(selected?.name).toBe("C");
+  });
+
+  it("removing the last remaining matchup clears the selection", () => {
+    const store = aStore();
+    const only = store.getState().addMatchup("Only");
+    store.getState().removeMatchup(only);
+    expect(store.getState().selectedMatchupId).toBeUndefined();
+  });
+
+  it("removing a non-selected matchup leaves the selection untouched", () => {
+    const store = aStore();
+    const a = store.getState().addMatchup("A");
+    const b = store.getState().addMatchup("B");
+    store.getState().selectMatchup(a);
+
+    store.getState().removeMatchup(b);
+    expect(store.getState().selectedMatchupId).toBe(a);
+  });
+});
+
+describe("workspaceStore — metadata (SPEC-C task C-6)", () => {
+  it("setPriority and setTags update only the targeted matchup", () => {
+    const store = aStore();
+    const id = store.getState().addMatchup("UR Murktide");
+
+    store.getState().setPriority(id, "high");
+    store.getState().setTags(id, ["tempo", "aggro"]);
+
+    const matchup = store.getState().workspace.matchups.find((m) => m.id === id);
+    expect(matchup?.priority).toBe("high");
+    expect(matchup?.tags).toEqual(["tempo", "aggro"]);
+  });
+});
+
+describe("workspaceStore — opponent deck (SPEC-C task C-7)", () => {
+  it("setOpponentDeck attaches a deck to the matchup without touching workspace.deck", () => {
+    const store = aStore();
+    const id = store.getState().addMatchup("UR Murktide");
+
+    store.getState().setOpponentDeck(id, deck);
+
+    const matchup = store.getState().workspace.matchups.find((m) => m.id === id);
+    expect(matchup?.opponentDeck).toEqual(deck);
+    expect(store.getState().workspace.deck).toBeUndefined();
+  });
+
+  it("removeOpponentDeck clears the opponent deck, leaving the matchup otherwise unchanged", () => {
+    const store = aStore();
+    const id = store.getState().addMatchup("UR Murktide");
+    store.getState().setOpponentDeck(id, deck);
+
+    store.getState().removeOpponentDeck(id);
+
+    const matchup = store.getState().workspace.matchups.find((m) => m.id === id);
+    expect(matchup?.opponentDeck).toBeUndefined();
+    expect(matchup?.name).toBe("UR Murktide");
   });
 });

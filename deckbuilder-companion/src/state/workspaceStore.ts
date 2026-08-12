@@ -1,14 +1,25 @@
 /**
- * SPEC-002 Task 9. Thin: it holds state and delegates every mutation to a
- * domain function. If a rule ever appears here, it belongs in
- * `src/domain/plan/` instead.
+ * SPEC-002 Task 9 / SPEC-C Task C-3. Thin: it holds state and delegates
+ * every mutation to a domain function. If a rule ever appears here, it
+ * belongs in `src/domain/plan/` or `src/domain/model/` instead — matchup
+ * construction, duplication, and reordering live in
+ * `src/domain/model/matchup.ts` (SPEC-C task C-1).
  *
  * Wrapped with zundo (FR-8.9) partialized to `workspace` only, so undo/redo
- * never touches `status` — restoring an old `workspace` into a stale
- * "resolving" or "error" status would be a bug.
+ * never touches `status` or `selectedMatchupId` — restoring an old
+ * `workspace` into a stale "resolving"/"error" status or a since-deleted
+ * selection would be a bug. `removeMatchup` needing to be undoable (FR-5.6)
+ * falls out of this for free: it's just another `workspace` mutation zundo
+ * already tracks, not a bespoke trash bin.
  */
 import { temporal } from "zundo";
 import { createStore } from "zustand/vanilla";
+import {
+  createMatchup,
+  duplicateMatchup,
+  renameMatchup as renameMatchupDomain,
+  reorder,
+} from "../domain/model/matchup";
 import type { IdFactory } from "../domain/model/ids";
 import type {
   Deck,
@@ -32,8 +43,11 @@ export type WorkspaceStatus = "empty" | "parsing" | "resolving" | "ready" | "par
 export interface WorkspaceState {
   readonly workspace: Workspace;
   readonly status: WorkspaceStatus;
+  /** SPEC-C task C-3 — which matchup the sidebar/detail view is showing. Not undo-tracked (see module doc). */
+  readonly selectedMatchupId?: MatchupId | undefined;
   setDeck(deck: Deck): void;
   addMatchup(name: string): MatchupId;
+  selectMatchup(id: MatchupId): void;
   renameMatchup(id: MatchupId, name: string): void;
   duplicateMatchup(id: MatchupId): MatchupId;
   removeMatchup(id: MatchupId): void;
@@ -45,35 +59,30 @@ export interface WorkspaceState {
   ): void;
   setSplitPlayDraw(id: MatchupId, split: boolean): void;
   setGamePlan(id: MatchupId, markdown: string): void;
+  setPriority(id: MatchupId, priority: Matchup["priority"]): void;
+  setTags(id: MatchupId, tags: readonly string[]): void;
+  /** SPEC-C task C-7 — reuses the SPEC-A import path; commits to the matchup, not `workspace.deck`. */
+  setOpponentDeck(id: MatchupId, deck: Deck): void;
+  removeOpponentDeck(id: MatchupId): void;
 }
 
 const EMPTY_PLAN: SideboardPlan = { out: [], in: [] };
-const PLAN_VARIANTS: readonly PlanVariant[] = ["unified", "onPlay", "onDraw"];
 
-function newMatchup(id: MatchupId, name: string): Matchup {
-  return { id, name, tags: [], gamePlan: "", splitPlayDraw: false, plans: {} };
-}
-
-function deepCopyPlan(plan: SideboardPlan): SideboardPlan {
-  return {
-    out: plan.out.map((entry) => ({ ...entry })),
-    in: plan.in.map((entry) => ({ ...entry })),
-  };
-}
-
-/**
- * A structural copy, not a shallow spread — `duplicateMatchup` must not
- * leave the copy's plan aliased to the original's (SPEC-002 Task 9).
- */
-function deepCopyPlans(plans: Matchup["plans"]): Matchup["plans"] {
-  const copy: Matchup["plans"] = {};
-  for (const variant of PLAN_VARIANTS) {
-    const plan = plans[variant];
-    if (plan !== undefined) {
-      copy[variant] = deepCopyPlan(plan);
-    }
-  }
+/** Drops an optional key entirely (vs. setting it to `undefined`, disallowed under `exactOptionalPropertyTypes`). */
+function omit<T extends object, K extends keyof T>(obj: T, key: K): Omit<T, K> {
+  const copy = { ...obj };
+  delete copy[key];
   return copy;
+}
+
+/** After removing the matchup at `removedIndex`, which id (if any) is the "sensible neighbour" to select. */
+function neighbourAfterRemoval(
+  matchupsAfterRemoval: readonly Matchup[],
+  removedIndex: number,
+): MatchupId | undefined {
+  if (matchupsAfterRemoval.length === 0) return undefined;
+  const neighbourIndex = Math.min(removedIndex, matchupsAfterRemoval.length - 1);
+  return matchupsAfterRemoval[neighbourIndex]?.id;
 }
 
 export function createWorkspaceStore(idFactory: IdFactory) {
@@ -82,30 +91,38 @@ export function createWorkspaceStore(idFactory: IdFactory) {
       (set, get) => ({
         workspace: { schemaVersion: 1, matchups: [] },
         status: "empty",
+        selectedMatchupId: undefined,
 
         setDeck: (deck) => {
           set((state) => ({ workspace: { ...state.workspace, deck }, status: "ready" }));
         },
 
         addMatchup: (name) => {
-          const id = idFactory.nextMatchupId();
+          const matchup = createMatchup(idFactory, name);
           set((state) => ({
-            workspace: {
-              ...state.workspace,
-              matchups: [...state.workspace.matchups, newMatchup(id, name)],
-            },
+            workspace: { ...state.workspace, matchups: [...state.workspace.matchups, matchup] },
+            selectedMatchupId: matchup.id,
           }));
-          return id;
+          return matchup.id;
         },
 
-        renameMatchup: (id, name) => {
+        selectMatchup: (id) => {
           if (!get().workspace.matchups.some((m) => m.id === id)) {
             return;
           }
+          set({ selectedMatchupId: id });
+        },
+
+        renameMatchup: (id, name) => {
+          const matchup = get().workspace.matchups.find((m) => m.id === id);
+          if (matchup === undefined) {
+            return;
+          }
+          const renamed = renameMatchupDomain(matchup, name);
           set((state) => ({
             workspace: {
               ...state.workspace,
-              matchups: state.workspace.matchups.map((m) => (m.id === id ? { ...m, name } : m)),
+              matchups: state.workspace.matchups.map((m) => (m.id === id ? renamed : m)),
             },
           }));
         },
@@ -116,14 +133,7 @@ export function createWorkspaceStore(idFactory: IdFactory) {
             return id;
           }
 
-          const newId = idFactory.nextMatchupId();
-          const copy: Matchup = {
-            ...source,
-            id: newId,
-            name: `${source.name} (copy)`,
-            plans: deepCopyPlans(source.plans),
-          };
-
+          const copy = duplicateMatchup(idFactory, source);
           set((state) => {
             const index = state.workspace.matchups.findIndex((m) => m.id === id);
             const matchups = [...state.workspace.matchups];
@@ -131,36 +141,35 @@ export function createWorkspaceStore(idFactory: IdFactory) {
             return { workspace: { ...state.workspace, matchups } };
           });
 
-          return newId;
+          return copy.id;
         },
 
         removeMatchup: (id) => {
-          if (!get().workspace.matchups.some((m) => m.id === id)) {
+          const { matchups } = get().workspace;
+          const index = matchups.findIndex((m) => m.id === id);
+          if (index === -1) {
             return;
           }
-          set((state) => ({
-            workspace: {
-              ...state.workspace,
-              matchups: state.workspace.matchups.filter((m) => m.id !== id),
-            },
-          }));
+
+          const wasSelected = get().selectedMatchupId === id;
+          set((state) => {
+            const nextMatchups = state.workspace.matchups.filter((m) => m.id !== id);
+            return {
+              workspace: { ...state.workspace, matchups: nextMatchups },
+              ...(wasSelected
+                ? { selectedMatchupId: neighbourAfterRemoval(nextMatchups, index) }
+                : {}),
+            };
+          });
         },
 
         reorderMatchups: (from, to) => {
-          const { matchups } = get().workspace;
-          const inRange = (index: number) => index >= 0 && index < matchups.length;
-          if (from === to || !inRange(from) || !inRange(to)) {
-            return;
-          }
-          set((state) => {
-            const next = [...state.workspace.matchups];
-            const [moved] = next.splice(from, 1);
-            if (moved === undefined) {
-              return state;
-            }
-            next.splice(to, 0, moved);
-            return { workspace: { ...state.workspace, matchups: next } };
-          });
+          set((state) => ({
+            workspace: {
+              ...state.workspace,
+              matchups: reorder(state.workspace.matchups, from, to),
+            },
+          }));
         },
 
         editPlan: (id, variant, fn) => {
@@ -208,6 +217,64 @@ export function createWorkspaceStore(idFactory: IdFactory) {
               ...state.workspace,
               matchups: state.workspace.matchups.map((m) =>
                 m.id === id ? { ...m, gamePlan: markdown } : m,
+              ),
+            },
+          }));
+        },
+
+        setPriority: (id, priority) => {
+          if (!get().workspace.matchups.some((m) => m.id === id)) {
+            return;
+          }
+          set((state) => ({
+            workspace: {
+              ...state.workspace,
+              matchups: state.workspace.matchups.map((m) => {
+                if (m.id !== id) return m;
+                if (priority === undefined) {
+                  return omit(m, "priority");
+                }
+                return { ...m, priority };
+              }),
+            },
+          }));
+        },
+
+        setTags: (id, tags) => {
+          if (!get().workspace.matchups.some((m) => m.id === id)) {
+            return;
+          }
+          set((state) => ({
+            workspace: {
+              ...state.workspace,
+              matchups: state.workspace.matchups.map((m) => (m.id === id ? { ...m, tags } : m)),
+            },
+          }));
+        },
+
+        setOpponentDeck: (id, deck) => {
+          if (!get().workspace.matchups.some((m) => m.id === id)) {
+            return;
+          }
+          set((state) => ({
+            workspace: {
+              ...state.workspace,
+              matchups: state.workspace.matchups.map((m) =>
+                m.id === id ? { ...m, opponentDeck: deck } : m,
+              ),
+            },
+          }));
+        },
+
+        removeOpponentDeck: (id) => {
+          if (!get().workspace.matchups.some((m) => m.id === id)) {
+            return;
+          }
+          set((state) => ({
+            workspace: {
+              ...state.workspace,
+              matchups: state.workspace.matchups.map((m) =>
+                m.id === id ? omit(m, "opponentDeck") : m,
               ),
             },
           }));
