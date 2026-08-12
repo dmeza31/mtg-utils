@@ -52,7 +52,7 @@ test("the opponent deck stays visible while editing the game plan (FR-5.8)", asy
   await page.getByTestId("parse-summary-confirm").click();
   await expect(matchupPage.opponentPanel.getByTestId("deck-view")).toBeVisible();
 
-  await page.getByTestId("matchup-game-plan").fill("Race them before they stabilize.");
+  await page.getByTestId("game-plan-editor").fill("Race them before they stabilize.");
 
   await expect(matchupPage.opponentPanel.getByTestId("deck-view")).toBeVisible();
 });

@@ -15,10 +15,14 @@
 import { temporal } from "zundo";
 import { createStore } from "zustand/vanilla";
 import {
+  copyPlanVariant as copyPlanVariantDomain,
   createMatchup,
+  disableSplitPlayDraw as disableSplitPlayDrawDomain,
   duplicateMatchup,
+  enableSplitPlayDraw as enableSplitPlayDrawDomain,
   renameMatchup as renameMatchupDomain,
   reorder,
+  type SplitKeepChoice,
 } from "../domain/model/matchup";
 import type { IdFactory } from "../domain/model/ids";
 import type {
@@ -57,7 +61,11 @@ export interface WorkspaceState {
     variant: PlanVariant,
     fn: (plan: SideboardPlan, ctx: PlanContext) => SideboardPlan,
   ): void;
-  setSplitPlayDraw(id: MatchupId, split: boolean): void;
+  /** SPEC-D task D-9 — seeds both variants from the existing unified plan (FR-6.8). */
+  enableSplitPlayDraw(id: MatchupId): void;
+  /** SPEC-D task D-9 — `keep` decides which variant becomes the new unified plan; never discards silently. */
+  disableSplitPlayDraw(id: MatchupId, keep: SplitKeepChoice): void;
+  copyPlanVariant(id: MatchupId, from: PlanVariant, to: PlanVariant): void;
   setGamePlan(id: MatchupId, markdown: string): void;
   setPriority(id: MatchupId, priority: Matchup["priority"]): void;
   setTags(id: MatchupId, tags: readonly string[]): void;
@@ -194,16 +202,44 @@ export function createWorkspaceStore(idFactory: IdFactory) {
           }));
         },
 
-        setSplitPlayDraw: (id, split) => {
-          if (!get().workspace.matchups.some((m) => m.id === id)) {
+        enableSplitPlayDraw: (id) => {
+          const matchup = get().workspace.matchups.find((m) => m.id === id);
+          if (matchup === undefined) {
             return;
           }
+          const next = enableSplitPlayDrawDomain(matchup);
           set((state) => ({
             workspace: {
               ...state.workspace,
-              matchups: state.workspace.matchups.map((m) =>
-                m.id === id ? { ...m, splitPlayDraw: split } : m,
-              ),
+              matchups: state.workspace.matchups.map((m) => (m.id === id ? next : m)),
+            },
+          }));
+        },
+
+        disableSplitPlayDraw: (id, keep) => {
+          const matchup = get().workspace.matchups.find((m) => m.id === id);
+          if (matchup === undefined) {
+            return;
+          }
+          const next = disableSplitPlayDrawDomain(matchup, keep);
+          set((state) => ({
+            workspace: {
+              ...state.workspace,
+              matchups: state.workspace.matchups.map((m) => (m.id === id ? next : m)),
+            },
+          }));
+        },
+
+        copyPlanVariant: (id, from, to) => {
+          const matchup = get().workspace.matchups.find((m) => m.id === id);
+          if (matchup === undefined) {
+            return;
+          }
+          const next = copyPlanVariantDomain(matchup, from, to);
+          set((state) => ({
+            workspace: {
+              ...state.workspace,
+              matchups: state.workspace.matchups.map((m) => (m.id === id ? next : m)),
             },
           }));
         },

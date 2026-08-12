@@ -8,7 +8,15 @@ import { describe, expect, it } from "vitest";
 import { createIdFactory } from "./ids";
 import { toCardId } from "./types";
 import type { Matchup } from "./types";
-import { createMatchup, duplicateMatchup, renameMatchup, reorder } from "./matchup";
+import {
+  copyPlanVariant,
+  createMatchup,
+  disableSplitPlayDraw,
+  duplicateMatchup,
+  enableSplitPlayDraw,
+  renameMatchup,
+  reorder,
+} from "./matchup";
 
 function countingIds() {
   let n = 0;
@@ -124,6 +132,101 @@ describe("duplicateMatchup (FR-5.5, story C4)", () => {
     const ids = countingIds();
     const source: Matchup = { ...createMatchup(ids, "Original"), gamePlan: "**Race them.**" };
     expect(duplicateMatchup(ids, source).gamePlan).toBe("**Race them.**");
+  });
+});
+
+describe("enableSplitPlayDraw (D-9, FR-6.8)", () => {
+  it("seeds both onPlay and onDraw from the existing unified plan rather than starting empty", () => {
+    const ids = countingIds();
+    const bolt = toCardId("bolt");
+    const source: Matchup = {
+      ...createMatchup(ids, "Original"),
+      plans: { unified: { out: [{ cardId: bolt, quantity: 2 }], in: [] } },
+    };
+
+    const split = enableSplitPlayDraw(source);
+
+    expect(split.splitPlayDraw).toBe(true);
+    expect(split.plans.onPlay!.out).toEqual([{ cardId: bolt, quantity: 2 }]);
+    expect(split.plans.onDraw!.out).toEqual([{ cardId: bolt, quantity: 2 }]);
+  });
+
+  it("the seeded variants don't alias each other or the unified plan", () => {
+    const ids = countingIds();
+    const bolt = toCardId("bolt");
+    const source: Matchup = {
+      ...createMatchup(ids, "Original"),
+      plans: { unified: { out: [{ cardId: bolt, quantity: 2 }], in: [] } },
+    };
+
+    const split = enableSplitPlayDraw(source);
+
+    expect(split.plans.onPlay!.out).not.toBe(split.plans.onDraw!.out);
+    expect(split.plans.onPlay!.out).not.toBe(source.plans.unified!.out);
+  });
+
+  it("treats a missing unified plan as empty rather than throwing", () => {
+    const ids = countingIds();
+    const source: Matchup = { ...createMatchup(ids, "Original"), plans: {} };
+    const split = enableSplitPlayDraw(source);
+    expect(split.plans.onPlay).toEqual({ out: [], in: [] });
+    expect(split.plans.onDraw).toEqual({ out: [], in: [] });
+  });
+});
+
+describe("disableSplitPlayDraw (D-9)", () => {
+  it("keeps the chosen variant as the new unified plan", () => {
+    const ids = countingIds();
+    const bolt = toCardId("bolt");
+    const source: Matchup = {
+      ...createMatchup(ids, "Original"),
+      splitPlayDraw: true,
+      plans: {
+        onPlay: { out: [{ cardId: bolt, quantity: 1 }], in: [] },
+        onDraw: { out: [{ cardId: bolt, quantity: 3 }], in: [] },
+      },
+    };
+
+    const result = disableSplitPlayDraw(source, "onDraw");
+
+    expect(result.splitPlayDraw).toBe(false);
+    expect(result.plans.unified!.out).toEqual([{ cardId: bolt, quantity: 3 }]);
+  });
+
+  it("never discards silently — the discarded variant's data simply isn't chosen", () => {
+    const ids = countingIds();
+    const bolt = toCardId("bolt");
+    const source: Matchup = {
+      ...createMatchup(ids, "Original"),
+      splitPlayDraw: true,
+      plans: {
+        onPlay: { out: [{ cardId: bolt, quantity: 1 }], in: [] },
+        onDraw: { out: [{ cardId: bolt, quantity: 3 }], in: [] },
+      },
+    };
+
+    const result = disableSplitPlayDraw(source, "onPlay");
+    expect(result.plans.unified!.out).toEqual([{ cardId: bolt, quantity: 1 }]);
+  });
+});
+
+describe("copyPlanVariant (D-9)", () => {
+  it("copies one variant's plan onto another, independent of the source afterwards", () => {
+    const ids = countingIds();
+    const bolt = toCardId("bolt");
+    const source: Matchup = {
+      ...createMatchup(ids, "Original"),
+      splitPlayDraw: true,
+      plans: {
+        onPlay: { out: [{ cardId: bolt, quantity: 1 }], in: [] },
+        onDraw: { out: [], in: [] },
+      },
+    };
+
+    const result = copyPlanVariant(source, "onPlay", "onDraw");
+
+    expect(result.plans.onDraw!.out).toEqual([{ cardId: bolt, quantity: 1 }]);
+    expect(result.plans.onDraw!.out).not.toBe(result.plans.onPlay!.out);
   });
 });
 

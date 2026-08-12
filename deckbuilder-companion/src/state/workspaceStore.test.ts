@@ -154,16 +154,43 @@ describe("workspaceStore (SPEC-002 Task 9)", () => {
     expect(store.getState().workspace.matchups.map((m) => m.name)).toEqual(["B", "C", "A"]);
   });
 
-  it("setSplitPlayDraw and setGamePlan update only the targeted matchup", () => {
+  it("enableSplitPlayDraw and setGamePlan update only the targeted matchup", () => {
     const store = aStore();
     const id = store.getState().addMatchup("UR Murktide");
 
-    store.getState().setSplitPlayDraw(id, true);
+    store.getState().enableSplitPlayDraw(id);
     store.getState().setGamePlan(id, "**Race** them.");
 
     const matchup = store.getState().workspace.matchups.find((m) => m.id === id);
     expect(matchup?.splitPlayDraw).toBe(true);
     expect(matchup?.gamePlan).toBe("**Race** them.");
+  });
+
+  it("enableSplitPlayDraw seeds both variants from the unified plan (FR-6.8)", () => {
+    const store = aStore();
+    store.getState().setDeck(deck);
+    const id = store.getState().addMatchup("UR Murktide");
+    store.getState().editPlan(id, "unified", (plan, ctx) => addOut(plan, ctx, bolt, 2));
+
+    store.getState().enableSplitPlayDraw(id);
+
+    const matchup = store.getState().workspace.matchups.find((m) => m.id === id);
+    expect(matchup?.plans.onPlay?.out).toEqual([{ cardId: bolt, quantity: 2 }]);
+    expect(matchup?.plans.onDraw?.out).toEqual([{ cardId: bolt, quantity: 2 }]);
+  });
+
+  it("disableSplitPlayDraw keeps the chosen variant as the new unified plan", () => {
+    const store = aStore();
+    store.getState().setDeck(deck);
+    const id = store.getState().addMatchup("UR Murktide");
+    store.getState().enableSplitPlayDraw(id);
+    store.getState().editPlan(id, "onDraw", (plan, ctx) => addOut(plan, ctx, bolt, 3));
+
+    store.getState().disableSplitPlayDraw(id, "onDraw");
+
+    const matchup = store.getState().workspace.matchups.find((m) => m.id === id);
+    expect(matchup?.splitPlayDraw).toBe(false);
+    expect(matchup?.plans.unified?.out).toEqual([{ cardId: bolt, quantity: 3 }]);
   });
 
   it("undo/redo round-trips through the temporal middleware without touching status", () => {

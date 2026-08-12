@@ -8,7 +8,9 @@
  */
 import { useState, type KeyboardEvent } from "react";
 import { DeckView } from "@/features/deck/DeckView";
+import { GamePlanEditor } from "@/features/plan/GamePlanEditor";
 import { ImportScreen } from "@/features/import/ImportScreen";
+import { SideboardPlanner } from "@/features/plan/SideboardPlanner";
 import { matchupStatus, type MatchupStatus } from "@/domain/plan/summary";
 import type { Matchup } from "@/domain/model/types";
 import { useWorkspaceState, useWorkspaceStoreApi } from "@/state/WorkspaceProvider";
@@ -157,24 +159,9 @@ export function MatchupDetail() {
         </div>
       </header>
 
-      <div className="space-y-2">
-        <h3 className="text-foreground text-sm font-semibold">Game plan</h3>
-        <textarea
-          data-testid="matchup-game-plan"
-          className="border-border bg-background h-32 w-full rounded-md border p-2 text-sm"
-          value={matchup.gamePlan}
-          onChange={(event) => store.getState().setGamePlan(matchup.id, event.target.value)}
-          placeholder="**Race them.** Board out slow cards, board in interaction."
-        />
-      </div>
+      <GamePlanEditor matchupId={matchup.id} gamePlan={matchup.gamePlan} />
 
-      {/* SPEC-D fills this in — kept empty so SPEC-C's E2E specs pass before it exists. */}
-      <div
-        data-testid="sideboard-planner-slot"
-        className="border-border rounded-md border border-dashed p-4"
-      >
-        <p className="text-muted-foreground text-sm">Sideboard planning arrives in SPEC-D.</p>
-      </div>
+      <SideboardPlanner matchup={matchup} deck={deck} />
 
       <section className="space-y-2" data-testid="opponent-deck-panel">
         <button
